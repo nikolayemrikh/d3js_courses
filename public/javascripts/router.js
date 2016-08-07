@@ -1,6 +1,8 @@
 //
 // Router
 //
+/* global app, Backbone, _, $ */
+
 define(["collections/courses"], function(Courses) {
     console.log('router.js');
     var $body = $('body');
@@ -12,7 +14,8 @@ define(["collections/courses"], function(Courses) {
             "start": "start",
             "main/:page": "main",
             "login": "login",
-            "*path": "something"
+            "*path": "something",
+            "start/createTask": "createTask"
         },
         render: function(View, options, auth) {
             if (auth || app.isAuth()) {
@@ -66,10 +69,15 @@ define(["collections/courses"], function(Courses) {
         },
         start: function() {
             var self = this;
+            var role = app.profile.get("role");
             require([
                 "views/start"
             ], function(View) {
-                self.render(View);
+                if (role == 3) {
+                    self.render(View, {role: 3});
+                } else {
+                    self.render(View);
+                }
             });
         },
         main: function(page) {
@@ -86,6 +94,14 @@ define(["collections/courses"], function(Courses) {
                         trigger: true
                     });
                 }
+            });
+        },
+        createTask: function() {
+            var self = this;
+            require([
+                "views/createTask"
+            ], function(View) {
+                self.render(View);
             });
         }
     });

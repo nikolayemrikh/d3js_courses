@@ -1,13 +1,17 @@
-//
+/*  global Backbone, app, _, BootstrapDialog
+*/
 define([
     "i18n",
     "text!templates/start.html",
-], function(i18n, template) {
+    "views/createTask"
+], function(i18n, template, createTaskView) {
     console.log('views/start.js');
     var View = Backbone.View.extend({
         events: {
             //"click .start-btn": "start"
-            "click .logout-btn": "doLogout"
+            "click .logout-btn": "doLogout",
+            "click .btn-create-task": "createTask",
+            "click .btn-edit-task": "editTask"
         },
         initialize: function(options) {
             var self = this;
@@ -17,9 +21,11 @@ define([
             // Templates
             this.templates = _.parseTemplate(template);
             // Sub views
-            this.view = {};
+            this.view = {
+                createTaskView: new createTaskView(),
+            };
             
-            var Courses = Backbone.Collection.extend({
+            this.Courses = Backbone.Collection.extend({
                 url: "/course",
                 sort_key: "number", // default sort key
                 comparator: function(item) {
@@ -31,10 +37,9 @@ define([
                 }
             });
             app.profile.fetch();
-            this.courses = new Courses();
+            //this.courses = new Courses();
             this.firstModelAt = 1;
-            this.listenTo(this.courses, 'add', this.appendCourse);
-            
+            //this.listenTo(this.courses, 'add', this.appendCourse);
             this.courseView = Backbone.View.extend({
                 tagName: "tr",
                 events: {
@@ -67,14 +72,22 @@ define([
         },
         render: function() {
             var self = this;
+            this.courses = null;
             var tpl = _.template(this.templates['main-tpl']);
             var data = {
                 i18n: i18n
             };
             this.$el.html(tpl(data));
-            self.courses.fetch();
+            if (this.options.role == 3) {
+                this.$(".btn-controls").css("display", "block");
+            }
             //this.courses.fetch();
+            this.courses = new this.Courses();
+            this.listenTo(this.courses, 'add', this.appendCourse);
+            
             this.$outputCoursesBody = this.$(".courses-body");
+            self.courses.fetch();
+            
             return this;
         },
         destroy: function() {
@@ -94,6 +107,24 @@ define([
         doLogout: function(event) {
             event.preventDefault();
             app.logout();
+        },
+        createTask: function(event) {
+            var self = this;
+            event.preventDefault();
+            event.stopPropagation();
+            if (!this.options.role || this.options.role != 3) return;
+            
+            this.dialog = new BootstrapDialog({
+                draggable: true
+            });
+            this.dialog.realize();
+            self.view.createTaskView.setElement(this.dialog.getModalDialog()).render();
+            this.dialog.open();
+        },
+        editTask: function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            if (!this.options.role || this.options.role != 3) return;
         }
     });
     return View;

@@ -21,6 +21,10 @@
         border-right: 0;
         border-bottom: 0;
     }
+    #content .btn-controls {
+        display: none;
+        float: right;
+    }
 </style>
 <nav class="navbar navbar-default">
     <div class="container">
@@ -43,8 +47,16 @@
 <div class="container">
     <!-- <a href="#main" type="button" class="start-btn btn btn-success">Let's go!</a> -->
     <div class="row">
-        <h2><%- i18n.t('start.title') %></h2>
-        <p><%- i18n.t('start.description') %></p>
+        <div calss="row">
+            <h2 class="col-md-6 col-xs-6"><%- i18n.t('start.title') %></h2>
+            <div class="col-md-6 col-xs-6">
+                <div class="btn-group btn-controls role="group" aria-label="controls">
+                    <a href="#" class="btn btn-default btn-create-task">Добавить задание</a>
+                    <a href="#" class="btn btn-default btn-edit-task">Редактировать задание</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12 col-xs-12"><p><%- i18n.t('start.description') %></p></div>
         <table id="courses-table" class="table table-bordered table-stripped">
             <thead>
                 <tr>
