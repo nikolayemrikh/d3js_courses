@@ -1,11 +1,12 @@
 /*  global Backbone, app, _, BootstrapDialog
-*/
+ */
 define([
     "i18n",
     "text!templates/start.html",
     "views/createTask",
+    "views/editTask",
     "models/taskModel"
-], function(i18n, template, createTaskView, TaskModel) {
+], function(i18n, template, createTaskView, editTaskView, TaskModel) {
     console.log('views/start.js');
     var View = Backbone.View.extend({
         events: {
@@ -27,7 +28,7 @@ define([
                     closeDialog: this.closeTaskDialog.bind(this)
                 })
             };
-            
+
             this.Courses = Backbone.Collection.extend({
                 model: TaskModel,
                 url: "/course",
@@ -63,6 +64,9 @@ define([
                         completedCourses: completedCourses
                     };
                     this.$el.html(this.tpl(data));
+                    if (self.options.role == 3) {
+                        this.$(".btn-controls").css("display", "block");
+                    }
                     return this;
                 },
                 start: function(event) {
@@ -88,10 +92,10 @@ define([
             //this.courses.fetch();
             this.courses = new this.Courses();
             this.listenTo(this.courses, 'add', this.appendCourse);
-            
+
             this.$outputCoursesBody = this.$(".courses-body");
             self.courses.fetch();
-            
+
             return this;
         },
         destroy: function() {
@@ -117,7 +121,7 @@ define([
             event.preventDefault();
             event.stopPropagation();
             if (!this.options.role || this.options.role != 3) return;
-            
+
             this.dialog = new BootstrapDialog({
                 draggable: true
             });
@@ -129,12 +133,19 @@ define([
             event.preventDefault();
             event.stopPropagation();
             if (!this.options.role || this.options.role != 3) return;
+
+            var number = event.currentTarget.dataset.number;
+            console.log(number);
+            app.router.navigate("editTask/" + number, {
+                trigger: true
+            });
         },
         closeTaskDialog: function() {
             if (this.dialog) {
                 this.dialog.close();
                 this.dialog = null;
             }
+            this.render();
         }
     });
     return View;

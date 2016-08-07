@@ -13,9 +13,9 @@ define(["collections/courses"], function(Courses) {
         routes: {
             "start": "start",
             "main/:page": "main",
+            "editTask/:page": "editTask",
             "login": "login",
-            "*path": "something",
-            "start/createTask": "createTask"
+            "*path": "something"
         },
         render: function(View, options, auth) {
             if (auth || app.isAuth()) {
@@ -96,12 +96,18 @@ define(["collections/courses"], function(Courses) {
                 }
             });
         },
-        createTask: function() {
+        editTask: function(page) {
             var self = this;
             require([
-                "views/createTask"
+                "views/editTask"
             ], function(View) {
-                self.render(View);
+                if (page && courses.findWhere({number: eval(page)})) {
+                    self.render(View, {page: page}, true);
+                } else {
+                    self.navigate("start", {
+                        trigger: true
+                    });
+                }
             });
         }
     });

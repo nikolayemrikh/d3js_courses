@@ -37,11 +37,6 @@ define([
         sendTask: function(event) {
             event.preventDefault();
             var form = this.el.querySelector("#create-task-form");
-            // var newTask = {
-            //     isChallange: form.elements.is_challenge.value == 1 ? true : false,
-            //     taskName: form.elements.task_title.value,
-            //     number: Number.parseInt(form.elements.task_number_in_course.value)
-            // };
             var newTask = new TaskModel;
             newTask.set({
                 isChallange: form.elements.is_challenge.value == 1 ? true : false,
