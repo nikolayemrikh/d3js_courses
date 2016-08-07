@@ -1,6 +1,7 @@
 //
 // Verify view
 //
+/* global Backbone, app, _, $ */
 define([
     "i18n",
     "text!templates/main.html",

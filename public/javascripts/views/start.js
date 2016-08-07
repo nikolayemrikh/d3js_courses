@@ -3,8 +3,9 @@
 define([
     "i18n",
     "text!templates/start.html",
-    "views/createTask"
-], function(i18n, template, createTaskView) {
+    "views/createTask",
+    "models/taskModel"
+], function(i18n, template, createTaskView, TaskModel) {
     console.log('views/start.js');
     var View = Backbone.View.extend({
         events: {
@@ -22,10 +23,13 @@ define([
             this.templates = _.parseTemplate(template);
             // Sub views
             this.view = {
-                createTaskView: new createTaskView(),
+                createTaskView: new createTaskView({
+                    closeDialog: this.closeTaskDialog.bind(this)
+                })
             };
             
             this.Courses = Backbone.Collection.extend({
+                model: TaskModel,
                 url: "/course",
                 sort_key: "number", // default sort key
                 comparator: function(item) {
@@ -118,13 +122,19 @@ define([
                 draggable: true
             });
             this.dialog.realize();
-            self.view.createTaskView.setElement(this.dialog.getModalDialog()).render();
+            self.view.createTaskView.setElement(this.dialog.getModalDialog()).render(this.courses);
             this.dialog.open();
         },
         editTask: function(event) {
             event.preventDefault();
             event.stopPropagation();
             if (!this.options.role || this.options.role != 3) return;
+        },
+        closeTaskDialog: function() {
+            if (this.dialog) {
+                this.dialog.close();
+                this.dialog = null;
+            }
         }
     });
     return View;
