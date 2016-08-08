@@ -1,27 +1,117 @@
 <script type="text/template" id="main-tpl">
-<style>
-</style>
-<nav class="navbar navbar-default">
-	<div class="container">
-		<div class="navbar-header">
-			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar1" aria-expanded="false">
+	<style>
+
+	</style>
+	<nav class="navbar navbar-default">
+		<div class="container">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar1" aria-expanded="false">
 	            <span class="sr-only">Toggle navigation</span>
 	            <span class="icon-bar"></span>
 	            <span class="icon-bar"></span>
 	            <span class="icon-bar"></span>
 	        </button>
-			<a class="navbar-brand" href="#"><%- i18n.t('app.title') %></a>
+				<a class="navbar-brand" href="#">
+					<%- i18n.t('app.title') %>
+				</a>
+			</div>
+			<div class="collapse navbar-collapse" id="navbar1">
+				<ul class="nav navbar-nav navbar-right">
+					<li><a href="#" class="logout-btn">Выход</a></li>
+				</ul>
+			</div>
 		</div>
-		<div class="collapse navbar-collapse" id="navbar1">
-	        <ul class="nav navbar-nav navbar-right">
-	            <li><a href="#" class="logout-btn">Выход</a></li>
-	        </ul>
-	    </div>
-    </div>
-</nav>
-<div class="container">
-	<div class="row">
-		
+	</nav>
+	<div class="container">
+		<div class="row">
+			<form id="edit-task-form" name="editTaskForm" class="form-horizontal" enctype="application/x-www-form-urlencoded" method="post" action="">
+				<div class="form-title form-group"><label for="task_title" class="control-label required col-md-2 col-xs-2">Название</label>
+					<div class="controls col-md-10 col-xs-10">
+						<input type="text" name="task_title" id="task_title" value="" class="form-control">
+					</div>
+				</div>
+				<div class="form-number form-group">
+					<label for="task_number_in_course" class="control-label required col-sm-2 col-xs-2">Номер в курсе</label>
+					<div class="controls col-sm-10 col-xs-10">
+						<input type="text" name="task_number_in_course" id="task_number_in_course" value="" class="form-control">
+					</div>
+				</div>
+				<div class="form-description form-group">
+					<label for="task-description" class="control-label col-sm-2 col-xs-2">Краткое описание</label>
+					<div class="controls col-sm-10 col-xs-10">
+						<input type="text" name="task-description" id="task-description" value="" class="form-control">
+					</div>
+				</div>
+				<div class="form-info form-group">
+					<label for="task-info" class="control-label col-sm-2 col-xs-2">Полное описание</label>
+					<div class="controls col-sm-10 col-xs-10">
+						<textarea class="form-control" name="task-info" id="task-info" rows="5"></textarea>
+					</div>
+				</div>
+				<div class="form-goals form-group">
+					<label for="task-goals" class="control-label col-sm-2 col-xs-2">Задачи</label>
+					<div class="controls col-sm-10 col-xs-10">
+						<textarea class="form-control" name="task-goals" id="task-goals" rows="5"></textarea>
+					</div>
+				</div>
+				<div class="form-js-check form-group">
+					<label for="task-js-check" class="control-label col-sm-2 col-xs-2">Проверяющий JS-код</label>
+					<div class="controls col-sm-10 col-xs-10">
+						<textarea class="form-control" name="task-js-check" id="task-js-check" rows="8"></textarea>
+					</div>
+				</div>
+				<div class="form-html-block form-group">
+					<label for="task-html-block" class="control-label col-sm-2 col-xs-2">Заблокировать HTML</label>
+					<div class="controls col-sm-10 col-xs-10 checkbox">
+						<input type="checkbox" name="task-html-block" id="task-html-block">
+					</div>
+				</div>
+				<div class="form-initial-html form-group">
+					<label for="task-initial-html" class="control-label col-sm-2 col-xs-2">Исходный HTML-код</label>
+					<div class="controls col-sm-10 col-xs-10">
+						<textarea class="form-control" name="task-initial-html" id="task-initial-html" rows="8"></textarea>
+					</div>
+				</div>
+				<div class="form-css-block form-group">
+					<label for="task-css-block" class="control-label col-sm-2 col-xs-2">Заблокировать CSS</label>
+					<div class="controls col-sm-10 col-xs-10 checkbox">
+						<input type="checkbox" name="task-css-block" id="task-css-block">
+					</div>
+				</div>
+				<div class="form-initial-css form-group">
+					<label for="task-initial-css" class="control-label col-sm-2 col-xs-2">Исходный CSS-код</label>
+					<div class="controls col-sm-10 col-xs-10">
+						<textarea class="form-control" name="task-initial-css" id="task-initial-css" rows="8"></textarea>
+					</div>
+				</div>
+				<div class="form-js-block form-group">
+					<label for="task-js-block" class="control-label col-sm-2 col-xs-2">Заблокировать CSS</label>
+					<div class="controls col-sm-10 col-xs-10 checkbox">
+						<input type="checkbox" name="task-js-block" id="task-js-block">
+					</div>
+				</div>
+				<div class="form-initial-js form-group">
+					<label for="task-initial-js" class="control-label col-sm-2 col-xs-2">Исходный JS-код</label>
+					<div class="controls col-sm-10 col-xs-10">
+						<textarea class="form-control" name="task-initial-js" id="task-initial-js" rows="8"></textarea>
+					</div>
+				</div>
+				<div class="form-option form-group">
+					<label for="is_challenge" class="control-label col-sm-2 col-xs-2">Тип задания</label>
+					<div class="controls col-sm-10 col-xs-10">
+						<select class="form-control" name="is_challenge" id="is_challenge">
+                            <option value="0">Обычное задание</option>
+                            <option value="1">Испытание</option>
+                        </select>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-sm-offset-2 col-sm-10">
+						<input type="submit" name="save" id="save" value="Добавить" class="btn btn-primary">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+					</div>
+				</div>
+			</form>
+		</div>
 	</div>
-</div>
 </script>

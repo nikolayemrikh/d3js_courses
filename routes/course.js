@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var courses = require('../db/dao/course');
-// List all courses
+// List all tasks in course
 router.get('/', function(req, res) {
     var args = {};
     courses.list(args, function(err, data) {
@@ -13,7 +13,21 @@ router.get('/', function(req, res) {
         }
     });
 });
-// Create new course
+// Get task by id
+router.get('/:taskId', function(req, res) {
+   var args = {
+       taskId: req.params.taskId
+   };
+   courses.getTask(args, function(err, data) {
+       if (!err && data) {
+            res.json(data);
+        }
+        else {
+            res.status(400).end();
+        }
+   });
+});
+// Create new task
 router.post('/', function(req, res) {
     var args = {
         data: req.body
@@ -21,6 +35,25 @@ router.post('/', function(req, res) {
     courses.add(args, function(err, data) {
         if (!err && data) {
             res.status(200).end();
+        }
+        else {
+            res.status(400).end();
+        }
+    });
+});
+// Update task
+router.put('/:taskId', function(req, res) {
+    var args = {
+        taskId: req.params.taskId,
+        data: req.body
+    };
+    courses.update(args, function(err, data) {
+        if (!err && data) {
+            /*req.login(data, function(error) {
+                if (error) res.status(400).end();
+                else res.json(data);
+            });*/
+            res.json(data);
         }
         else {
             res.status(400).end();
