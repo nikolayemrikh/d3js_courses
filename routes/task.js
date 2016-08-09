@@ -1,10 +1,10 @@
 var express = require('express');
 var router = express.Router();
-var course = require('../db/dao/course');
-// List all course in course
+var task = require('../db/dao/task');
+// List all task in course
 router.get('/', function(req, res) {
     var args = {};
-    course.list(args, function(err, data) {
+    task.list(args, function(err, data) {
         if (!err && data) {
             res.json(data);
         }
@@ -13,12 +13,12 @@ router.get('/', function(req, res) {
         }
     });
 });
-// Get course by id
+// Get task by id
 router.get('/:taskId', function(req, res) {
    var args = {
        taskId: req.params.taskId
    };
-   course.getCourse(args, function(err, data) {
+   task.getTask(args, function(err, data) {
        if (!err && data) {
             res.json(data);
         }
@@ -27,12 +27,12 @@ router.get('/:taskId', function(req, res) {
         }
    });
 });
-// Create new course
+// Create new task
 router.post('/', function(req, res) {
     var args = {
         data: req.body
     };
-    course.add(args, function(err, data) {
+    task.add(args, function(err, data) {
         if (!err && data) {
             res.status(200).end();
         }
@@ -41,13 +41,13 @@ router.post('/', function(req, res) {
         }
     });
 });
-// Update course
+// Update task
 router.put('/:taskId', function(req, res) {
     var args = {
         taskId: req.params.taskId,
         data: req.body
     };
-    course.update(args, function(err, data) {
+    task.update(args, function(err, data) {
         if (!err && data) {
             /*req.login(data, function(error) {
                 if (error) res.status(400).end();

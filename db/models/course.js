@@ -1,41 +1,21 @@
 /**
- * Модель курсов
+ * Модель задания
  */
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var Course = new Schema({
-    // Номер
+    // Имя курса
+    name: {
+        type: String
+    },
     number: {
         type: Number
     },
-    // Название задания
-    taskName: {
-        type: String
-    },
-    // Краткое описание задания
-    taskDescription: {
-        type: String
-    },
-    // Полное описание задания
-    taskInfo: {
-        type: String
-    },
-    taskData: {
-        helpInfo: {
-            type: Schema.Types.Mixed
-        },
-        helpData: {
-            type: Schema.Types.Mixed
-        },
-        dataInfo: {
-            type: Schema.Types.Mixed
-        },
-        data: {
-            type: Schema.Types.Mixed
-        }
-    },
-    code: {
-        type: String
-    }
+    // Задания в курсе
+    tasks: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Task'
+    }]
 });
-module.exports = mongoose.model('Course', Course);
+var collectionName = 'courses';
+module.exports = mongoose.model('Course', Course, collectionName);

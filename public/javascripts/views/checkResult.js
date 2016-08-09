@@ -77,17 +77,17 @@ define([
                 document.querySelector(".panel-difference").appendChild(i);
                 //TODO
                 if (data.misMatchPercentage < 0.1) {
-                    var completedCourses = app.profile.get("completedCourses");
-                    console.log(completedCourses);
+                    var completedTasks = app.profile.get("completedTasks");
+                    console.log(completedTasks);
                     app.profile.fetch();
-                    if (!completedCourses) {
-                        completedCourses.push(self.currentTask.attributes._id);
-                        app.profile.set("completedCourses", completedCourses);
+                    if (!completedTasks) {
+                        completedTasks.push(self.currentTask.attributes._id);
+                        app.profile.set("completedTasks", completedTasks);
                         app.profile.save();
                     } else {
-                        if (_.indexOf(completedCourses, self.currentTask.attributes._id) == -1) {
-                            completedCourses.push(self.currentTask.attributes._id);
-                            app.profile.set("completedCourses", completedCourses);
+                        if (_.indexOf(completedTasks, self.currentTask.attributes._id) == -1) {
+                            completedTasks.push(self.currentTask.attributes._id);
+                            app.profile.set("completedTasks", completedTasks);
                             app.profile.save();
                         }
                     }

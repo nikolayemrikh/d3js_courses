@@ -2,19 +2,25 @@ var Course = require('../models/course');
 module.exports = {
     add: function(args, callback) {
         var course = new Course({
-            number: args.data.number,
-            taskName: args.data.taskName,
-            taskDescription: args.data.taskDescription,
-            
+            name: args.data.name
         });
         course.save(callback);
     },
     list: function(args, callback) {
-        //Course.find({}, callback);
-        Course.find({}).sort({"number": 1}).exec(callback);
+        //Course.find({}).populate('tasks').sort({"number": 1}).exec(callback);
+        Course.find({}).sort({
+            "number": 1
+        }).exec(callback);
     },
-    getTask: function(args, callback) {
-        Course.findById(args.taskId).exec(callback);
+    getCourse: function(args, callback) {
+        Course.findById(args.taskId).populate({
+            path: "tasks",
+            options: {
+                sort: {
+                    "number": 1
+                }
+            }
+        }).exec(callback);
     },
     update: function(args, callback) {
         var data = args.data || {};
@@ -22,9 +28,9 @@ module.exports = {
             '$set': data
         }, {
             'new': true
-        }, function(err, task) {
-            callback(err, task);
-            task.save();
+        }, function(err, course) {
+            callback(err, course);
+            course.save();
         });
     }
 }

@@ -3,15 +3,15 @@
 //
 /* global app, Backbone, _, $ */
 
-define(["collections/courses"], function(Courses) {
+define(["collections/tasks"], function(Tasks) {
     console.log('router.js');
     var $body = $('body');
     var $content = $('<div id="content"></div>');
-    var courses = new Courses();
-    courses.fetch();
+    var tasks = new Tasks();
+    tasks.fetch();
     var Router = Backbone.Router.extend({
         routes: {
-            "start": "start",
+            "start(/:course)": "start",
             "main/:page": "main",
             "editTask/:page": "editTask",
             "login": "login",
@@ -28,7 +28,8 @@ define(["collections/courses"], function(Courses) {
                 console.log(options.page)
                 app.content = new View(options);
                 app.content.render();
-            } else {
+            }
+            else {
                 this.navigate("login", {
                     trigger: true
                 });
@@ -67,17 +68,24 @@ define(["collections/courses"], function(Courses) {
                 });
             }
         },
-        start: function() {
+        start: function(course) {
             var self = this;
-            var role = app.profile.get("role");
+            //var role = app.profile.get("role");
             require([
                 "views/start"
             ], function(View) {
-                if (role == 3) {
-                    self.render(View, {role: 3});
-                } else {
-                    self.render(View);
-                }
+                app.profile.fetch({
+                    success: function(model, response, error) {
+                        var role = model.get("role");
+                        if (role != 3) role = null;
+                        self.render(View, {
+                            courseNumber: course,
+                            profile: model,
+                            role: role
+                        }, true);
+                    }
+                });
+                
             });
         },
         main: function(page) {
@@ -85,10 +93,17 @@ define(["collections/courses"], function(Courses) {
             require([
                 "views/main"
             ], function(View) {
-                console.log(page, courses.findWhere({number: eval(page)}));
-                if (page && courses.findWhere({number: eval(page)})) {
-                    self.render(View, {page: page}, true);
-                } else {
+                console.log(page, tasks.findWhere({
+                    number: eval(page)
+                }));
+                if (page && tasks.findWhere({
+                        number: eval(page)
+                    })) {
+                    self.render(View, {
+                        page: page
+                    }, true);
+                }
+                else {
                     //self.render(View, null ,true);
                     self.navigate("start", {
                         trigger: true
@@ -101,9 +116,14 @@ define(["collections/courses"], function(Courses) {
             require([
                 "views/editTask"
             ], function(View) {
-                if (page && courses.findWhere({number: eval(page)})) {
-                    self.render(View, {page: page}, true);
-                } else {
+                if (page && tasks.findWhere({
+                        number: eval(page)
+                    })) {
+                    self.render(View, {
+                        page: page
+                    }, true);
+                }
+                else {
                     self.navigate("start", {
                         trigger: true
                     });

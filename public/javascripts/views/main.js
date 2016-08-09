@@ -39,7 +39,7 @@ define([
             this.firstModelAt = options.page;
             var Tasks = Backbone.Collection.extend({
                 //url: "data/tasks.json"
-                url: "/course"
+                url: "/task"
             });
             this.tasks = new Tasks();
         },

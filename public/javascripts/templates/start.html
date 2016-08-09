@@ -22,8 +22,10 @@
         border-bottom: 0;
     }
     #content .btn-controls {
-        display: none;
         float: right;
+    }
+    #content .btn-create-item {
+        display: none;
     }
 </style>
 <nav class="navbar navbar-default">
@@ -48,18 +50,21 @@
     <!-- <a href="#main" type="button" class="start-btn btn btn-success">Let's go!</a> -->
     <div class="row">
         <div calss="row">
-            <h2 class="col-md-6 col-xs-6"><%- i18n.t('start.title') %></h2>
+            <h2 class="col-md-6 col-xs-6"><% if (collection === "course") {%><%-i18n.t('start.title')%><%} else if (collection === "task") {%>Задания курса #<%-courseNumber%><%}%></h2>
             <div class="col-md-6 col-xs-6">
-                <button href="#" class="btn btn-default btn-controls btn-create-task">Добавить задание</button>
+                <div class="btn-group btn-controls" role="group" aria-label="Кнопоньки">
+                    <%if (collection === "task") {%><button href="#" class="btn btn-default btn-back">Назад к курсам</button><%}%>
+                    <button href="#" class="btn btn-default btn-create-item"><%if (collection === "course") {%>Добавить курс<%} else if (collection === "task") {%>Добавить задание<%}%></button>
+                </div>
             </div>
         </div>
-        <div class="col-md-12 col-xs-12"><p><%- i18n.t('start.description') %></p></div>
+        <div class="col-md-12 col-xs-12"><p><% if (collection === "course") {%><%- i18n.t('start.description') %><%}%></p></div>
         <table id="courses-table" class="table table-bordered table-stripped">
             <thead>
                 <tr>
-                    <th><%- i18n.t('start.name') %></th>
+                    <th><%if (collection === "course") {%><%- i18n.t('start.name') %><%} else if (collection === "task") {%>Название и описание задания<%}%></th>
                     <th class="status"><%- i18n.t('start.status') %></th>
-                    <th></th>
+                    <th class="status"></th>
                 </tr>
             </thead>
             <tbody class="courses-body">
@@ -73,17 +78,17 @@
     <td>
         <div class="row">
             <div class="col-md-10 col-xs-10">
-                <h3><%- course.taskName %></h3>
-                <p><%= course.taskDescription %></p>
+                <h3><%- name %></h3>
+                <p><%= description %></p>
             </div>
             <div class="col-md-2 col-xs-2">
-                <button type="button" class="btn btn-default btn-controls btn-edit-task" data-number="<%- course.number %>">
+                <button type="button" class="btn btn-default btn-controls btn-edit-task" data-number="<%- number %>">
                     <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
                 </button>
             </div>
         </div>
     </td>
-    <td><span class="label label-success"><% if (_.indexOf(completedCourses, course._id) != -1) {
+    <td><span class="label label-success"><% if (_.indexOf(completedItems, _id) != -1) {
             %> Пройдено <%
         }%></span></td>
     <td><a href="#" class="btn btn-default start-course-btn">Начать</a></td>

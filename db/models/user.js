@@ -5,7 +5,7 @@ var mongoose = require('mongoose');
 var crypto = require('crypto');
 var Schema = mongoose.Schema;
 var Attach = require('./attach').schema;
-var Course = require("./course").schema;
+var Task = require("./task").schema;
 var User = new Schema({
     // Логин
     username: {
@@ -99,6 +99,10 @@ var User = new Schema({
     completedCourses: [{
         type: Schema.Types.ObjectId,
         ref: 'Course'
+    }],
+    completedTasks: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Task'
     }]
 });
 User.methods.encryptPassword = function(password) {
