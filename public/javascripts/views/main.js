@@ -43,6 +43,7 @@ define([
             });
             this.tasks = new Tasks();
         },
+        // Говнокод!
         render: function() {
             var self = this;
             var tpl = _.template(this.templates['main-tpl']);

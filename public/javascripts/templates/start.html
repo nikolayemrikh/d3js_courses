@@ -50,19 +50,19 @@
     <!-- <a href="#main" type="button" class="start-btn btn btn-success">Let's go!</a> -->
     <div class="row">
         <div calss="row">
-            <h2 class="col-md-6 col-xs-6"><% if (collection === "course") {%><%-i18n.t('start.title')%><%} else if (collection === "task") {%>Задания курса #<%-courseNumber%><%}%></h2>
+            <h2 class="col-md-6 col-xs-6"><% if (collectionName === "course") {%><%-i18n.t('start.title')%><%} else if (collectionName === "task") {%>Задания курса #<%-courseNumber%><%}%></h2>
             <div class="col-md-6 col-xs-6">
                 <div class="btn-group btn-controls" role="group" aria-label="Кнопоньки">
-                    <%if (collection === "task") {%><button href="#" class="btn btn-default btn-back">Назад к курсам</button><%}%>
-                    <button href="#" class="btn btn-default btn-create-item"><%if (collection === "course") {%>Добавить курс<%} else if (collection === "task") {%>Добавить задание<%}%></button>
+                    <%if (collectionName === "task") {%><button href="#" class="btn btn-default btn-back">Назад к курсам</button><%}%>
+                    <button href="#" class="btn btn-default btn-create-item"><%if (collectionName === "course") {%>Добавить курс<%} else if (collectionName === "task") {%>Добавить задание<%}%></button>
                 </div>
             </div>
         </div>
-        <div class="col-md-12 col-xs-12"><p><% if (collection === "course") {%><%- i18n.t('start.description') %><%}%></p></div>
+        <div class="col-md-12 col-xs-12"><p><% if (collectionName === "course") {%><%- i18n.t('start.description') %><%}%></p></div>
         <table id="courses-table" class="table table-bordered table-stripped">
             <thead>
                 <tr>
-                    <th><%if (collection === "course") {%><%- i18n.t('start.name') %><%} else if (collection === "task") {%>Название и описание задания<%}%></th>
+                    <th><%if (collectionName === "course") {%><%- i18n.t('start.name') %><%} else if (collectionName === "task") {%>Название и описание задания<%}%></th>
                     <th class="status"><%- i18n.t('start.status') %></th>
                     <th class="status"></th>
                 </tr>
@@ -82,7 +82,7 @@
                 <p><%= description %></p>
             </div>
             <div class="col-md-2 col-xs-2">
-                <button type="button" class="btn btn-default btn-controls btn-edit-task" data-number="<%- number %>">
+                <button type="button" class="btn btn-default btn-controls btn-edit-item" data-number="<%- number %>">
                     <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
                 </button>
             </div>

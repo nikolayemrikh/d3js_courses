@@ -13,7 +13,7 @@ define(["collections/tasks"], function(Tasks) {
         routes: {
             "start(/:course)": "start",
             "main/:page": "main",
-            "editTask/:page": "editTask",
+            "editTask/:collectionName/:page": "editTask",
             "login": "login",
             "*path": "something"
         },
@@ -85,7 +85,7 @@ define(["collections/tasks"], function(Tasks) {
                         }, true);
                     }
                 });
-                
+
             });
         },
         main: function(page) {
@@ -111,7 +111,7 @@ define(["collections/tasks"], function(Tasks) {
                 }
             });
         },
-        editTask: function(page) {
+        editTask: function(collectionName, page) {
             var self = this;
             require([
                 "views/editTask"
@@ -120,7 +120,8 @@ define(["collections/tasks"], function(Tasks) {
                         number: eval(page)
                     })) {
                     self.render(View, {
-                        page: page
+                        page: page,
+                        collectionName: collectionName
                     }, true);
                 }
                 else {

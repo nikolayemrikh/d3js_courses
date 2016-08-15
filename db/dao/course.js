@@ -7,10 +7,12 @@ module.exports = {
         course.save(callback);
     },
     list: function(args, callback) {
-        //Course.find({}).populate('tasks').sort({"number": 1}).exec(callback);
-        Course.find({}).sort({
+        Course.find({}).populate('tasks').sort({
             "number": 1
         }).exec(callback);
+        /*Course.find({}).sort({
+            "number": 1
+        }).exec(callback);*/
     },
     getCourse: function(args, callback) {
         Course.findById(args.taskId).populate({

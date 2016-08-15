@@ -4,8 +4,9 @@
 define([
     "i18n",
     "text!templates/editTask.html",
-    "models/taskModel"
-], function(i18n, template, TaskModel) {
+    "models/taskModel",
+    "models/courseModel"
+], function(i18n, template, TaskModel, CourseModel) {
     console.log('views/editTask.js');
     var View = Backbone.View.extend({
         className: "editTask",
@@ -16,10 +17,21 @@ define([
             this.options = options || {};
             // Templates
             this.templates = _.parseTemplate(template);
+            this.collectionName = options.collectionName;
+            this.modelNumber = options.page;
+            if (this.collectionName === "course") {
+                this.Model = CourseModel;
+            } else if (this.collectionName === "task") {
+                this.Model = TaskModel;
+            }
+            this.model = new this.Model({
+                number: this.modelNumber
+            });
         },
-        render: function(courses) {
+        render: function() {
             var self = this;
-            this.courses = courses;
+            this.model.fetch();
+            console.log(this.model);
             var data = {
                 i18n: i18n
             };
