@@ -6,6 +6,10 @@ router.get('/', function(req, res) {
     var args = {};
     course.list(args, function(err, data) {
         if (!err && data) {
+            /*data = data.map(function(course) {
+                course._id = course.number;
+                return course;
+            });*/
             res.json(data);
         }
         else {
@@ -15,17 +19,17 @@ router.get('/', function(req, res) {
 });
 // Get course by number
 router.get('/:number', function(req, res) {
-   var args = {
-       number: req.params.number
-   };
-   course.getCourse(args, function(err, data) {
-       if (!err && data) {
+    var args = {
+        number: req.params.number
+    };
+    course.getCourse(args, function(err, data) {
+        if (!err && data) {
             res.json(data);
         }
         else {
             res.status(400).end();
         }
-   });
+    });
 });
 // Create new course
 router.post('/', function(req, res) {
@@ -49,10 +53,7 @@ router.put('/:number', function(req, res) {
     };
     course.update(args, function(err, data) {
         if (!err && data) {
-            /*req.login(data, function(error) {
-                if (error) res.status(400).end();
-                else res.json(data);
-            });*/
+            //data._id = data.number;
             res.json(data);
         }
         else {

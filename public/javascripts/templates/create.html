@@ -1,0 +1,43 @@
+<script type="text/template" id="main-tpl">
+    <style>
+
+    </style>
+    <div class="modal-content">
+        <div class="modal-header bootstrap-dialog-draggable">
+            <h2>Добавить задание</h2>
+        </div>
+        <div class="modal-body">
+            <form id="create-task-form" name="createTaskForm" class="form-horizontal" enctype="application/x-www-form-urlencoded" method="post" action="">
+                <div class="form-option form-group">
+                    <label for="is_challenge" class="control-label required col-sm-4">Тип задания</label>
+                    <div class="controls col-sm-8">
+                        <select class="form-control" name="is_challenge" id="is_challenge">
+                            <option value="0">Обычное задание</option>
+                            <option value="1">Испытание</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-title form-group"><label for="task_title" class="control-label required col-sm-4">Название</label>
+                    <div class="controls col-sm-8">
+                        <input type="text" name="task_title" id="task_title" value="" class="form-control">
+                    </div>
+                </div>
+                <div class="form-number form-group">
+                    <label for="task_number_in_course" class="control-label required col-sm-4">Номер в курсе</label>
+                    <div class="controls col-sm-8">
+                        <input type="text" name="task_number_in_course" id="task_number_in_course" value="" class="form-control">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-4 col-sm-8">
+                        <input type="submit" name="save" id="save" value="Добавить" class="btn btn-primary">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <!-- <div class="modal-footer"> -->
+            <!-- <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button> -->
+        <!-- </div> -->
+    </div>
+</script>

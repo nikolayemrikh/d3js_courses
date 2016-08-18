@@ -30,7 +30,7 @@ module.exports = {
     update: function(args, callback) {
         var data = args.data || {};
         //Course.findByIdAndUpdate(args.taskId, {
-        Course.findOneAndUpdate(args.number, {
+        Course.findOneAndUpdate({number: args.number}, {
             '$set': data
         }, {
             'new': true

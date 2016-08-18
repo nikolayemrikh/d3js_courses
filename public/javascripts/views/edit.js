@@ -63,7 +63,7 @@ define([
                 });
             }
             else if (this.collectionName === "task") {
-                app.router.navigate("start/" + this.number, {
+                app.router.navigate("start/" + this.courseNumber, {
                     trigger: true
                 });
             }

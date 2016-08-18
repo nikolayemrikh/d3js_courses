@@ -3,13 +3,13 @@
 define([
     "i18n",
     "text!templates/start.html",
-    "views/createTask",
+    "views/create",
     "views/edit",
     "collections/tasks",
     "collections/courses",
     "models/taskModel",
     "models/courseModel"
-], function(i18n, template, createTaskView, editView, TasksCollection, CoursesCollection, TaskModel, CourseModel) {
+], function(i18n, template, createView, editView, TasksCollection, CoursesCollection, TaskModel, CourseModel) {
     console.log('views/start.js');
     var View = Backbone.View.extend({
         events: {
@@ -27,7 +27,7 @@ define([
             this.templates = _.parseTemplate(template);
             // Sub views
             this.view = {
-                createTaskView: new createTaskView({
+                createView: new createView({
                     closeDialog: this.closeTaskDialog.bind(this)
                 })
             };
@@ -182,7 +182,10 @@ define([
                 draggable: true
             });
             this.dialog.realize();
-            self.view.createTaskView.setElement(this.dialog.getModalDialog()).render(this.items);
+            if (this.collectionName === "task") {
+                var courseNumber = this.options.courseNumber;
+            }
+            self.view.createView.setElement(this.dialog.getModalDialog()).render(courseNumber, this.tasksCollection, this.courseModel);
             this.dialog.open();
         },
         closeTaskDialog: function() {
