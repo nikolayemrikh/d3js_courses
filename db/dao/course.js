@@ -7,7 +7,8 @@ module.exports = {
         course.save(callback);
     },
     list: function(args, callback) {
-        Course.find({}).populate('tasks').sort({
+        //Забираем из модели Task только нужные для #start поля
+        Course.find({}).populate('tasks', 'taskDescription taskName number').sort({
             "number": 1
         }).exec(callback);
         /*Course.find({}).sort({
@@ -15,8 +16,10 @@ module.exports = {
         }).exec(callback);*/
     },
     getCourse: function(args, callback) {
-        Course.findById(args.taskId).populate({
+        //Course.findById(args.taskId).populate({
+        Course.findOne({number: args.number}).populate({
             path: "tasks",
+            select: "taskDescription taskName number",
             options: {
                 sort: {
                     "number": 1
@@ -26,7 +29,8 @@ module.exports = {
     },
     update: function(args, callback) {
         var data = args.data || {};
-        Course.findByIdAndUpdate(args.taskId, {
+        //Course.findByIdAndUpdate(args.taskId, {
+        Course.findOneAndUpdate(args.number, {
             '$set': data
         }, {
             'new': true

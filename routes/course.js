@@ -13,10 +13,10 @@ router.get('/', function(req, res) {
         }
     });
 });
-// Get course by id
-router.get('/:taskId', function(req, res) {
+// Get course by number
+router.get('/:number', function(req, res) {
    var args = {
-       taskId: req.params.taskId
+       number: req.params.number
    };
    course.getCourse(args, function(err, data) {
        if (!err && data) {
@@ -42,9 +42,9 @@ router.post('/', function(req, res) {
     });
 });
 // Update course
-router.put('/:taskId', function(req, res) {
+router.put('/:number', function(req, res) {
     var args = {
-        taskId: req.params.taskId,
+        number: req.params.number,
         data: req.body
     };
     course.update(args, function(err, data) {

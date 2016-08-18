@@ -5,8 +5,11 @@ define([
     "text!templates/start.html",
     "views/createTask",
     "views/editTask",
-    "collections/tasks"
-], function(i18n, template, createTaskView, editTaskView, TasksCollection) {
+    "collections/tasks",
+    "collections/courses",
+    "models/taskModel",
+    "models/courseModel"
+], function(i18n, template, createTaskView, editTaskView, TasksCollection, CoursesCollection, TaskModel, CourseModel) {
     console.log('views/start.js');
     var View = Backbone.View.extend({
         events: {
@@ -29,38 +32,16 @@ define([
                 })
             };
             app.profile.fetch();
+            var collectionName, completedItems;
             if (!this.options.courseNumber) {
-                var collectionName = "course";
-                var collectionUrl = "/course";
-                var completedItems = this.options.profile.get("completedCourses");
+                collectionName = "course";
+                completedItems = this.options.profile.get("completedCourses");
             }
             else {
-                var collectionName = "task";
-                var collectionUrl = "/course";
-                var completedItems = this.options.profile.get("completedTasks");
+                collectionName = "task";
+                completedItems = this.options.profile.get("completedTasks");
             }
             this.collectionName = collectionName;
-            console.log(completedItems)
-                /*this.collectionInfo = {
-                    collectionName: "course",
-                    collectionUrl: "/course",
-                    completedItems: this.options.profile.get("completedCourses")
-                };*/
-
-            this.Courses = Backbone.Collection.extend({
-                url: collectionUrl,
-                sort_key: "number", // default sort key
-                comparator: function(item) {
-                    return item.get(this.sort_key);
-                },
-                sortByField: function(fieldName) {
-                    this.sort_key = fieldName;
-                    this.sort();
-                }
-            });
-            //this.courses = new Courses();
-            this.firstModelAt = 1;
-            //this.listenTo(this.courses, 'add', this.appendCourse);
             this.courseView = Backbone.View.extend({
                 tagName: "tr",
                 events: {
@@ -74,6 +55,7 @@ define([
                     this.listenTo(this.model, 'destroy', this.remove);
                 },
                 render: function() {
+                    console.log(this.model)
                     this.number = this.model.attributes.number;
                     var data;
                     if (collectionName === "course") {
@@ -129,8 +111,9 @@ define([
         },
         render: function() {
             var self = this;
-            this.courses = null;
-            this.items = null;
+            this.tasksCollection = null;
+            this.courseModel = null;
+            this.coursesCollection = null;
             var tpl = _.template(this.templates['main-tpl']);
             var data = {
                 i18n: i18n,
@@ -141,36 +124,34 @@ define([
             if (this.options.role == 3) {
                 this.$(".btn-create-item").css("display", "block");
             }
-            //this.courses.fetch();
-            this.courses = new this.Courses();
-            
             if (this.collectionName === "task") {
-                this.items = new TasksCollection();
+                this.courseModel = new CourseModel({
+                    _id: this.options.courseNumber
+                });
+                this.tasksCollection = new TasksCollection();
+                this.listenTo(this.tasksCollection, 'add', this.appendCourse);
+                this.courseModel.fetch({
+                    success: function(model, response, options) {
+                        var tasks = model.attributes.tasks;
+                        self.tasksCollection.add(tasks);
+                    }
+                });
             } else if (this.collectionName === "course") {
-                this.items = this.courses;
+                this.coursesCollection = new CoursesCollection();
+                this.listenTo(this.coursesCollection, 'add', this.appendCourse);
+                this.coursesCollection.fetch();
             }
-            this.listenTo(this.items, 'add', this.appendCourse);
 
             this.$outputCoursesBody = this.$(".courses-body");
-            self.courses.fetch({
-                success: function(collection, response, options) {
-                    if (self.collectionName === "task") {
-                        var course = collection.findWhere({
-                            number: Number.parseInt(self.options.courseNumber)
-                        });
-                        var tasks = course.attributes.tasks;
-                        console.log(tasks)
-                        self.items.add(tasks);
-                    }
-                }
-            });
-
             return this;
         },
         destroy: function() {
             for (var v in this.view) {
                 if (this.view[v]) this.view[v].destroy();
             }
+            this.tasksCollection = null;
+            this.courseModel = null;
+            this.coursesCollection = null;
             this.remove();
         },
         appendCourse: function(courseModel) {

@@ -14,9 +14,9 @@ router.get('/', function(req, res) {
     });
 });
 // Get task by id
-router.get('/:taskId', function(req, res) {
+router.get('/:number', function(req, res) {
    var args = {
-       taskId: req.params.taskId
+       number: req.params.number
    };
    task.getTask(args, function(err, data) {
        if (!err && data) {
@@ -42,9 +42,9 @@ router.post('/', function(req, res) {
     });
 });
 // Update task
-router.put('/:taskId', function(req, res) {
+router.put('/:number', function(req, res) {
     var args = {
-        taskId: req.params.taskId,
+        number: req.params.number,
         data: req.body
     };
     task.update(args, function(err, data) {
