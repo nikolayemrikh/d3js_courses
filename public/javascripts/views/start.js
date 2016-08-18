@@ -4,12 +4,12 @@ define([
     "i18n",
     "text!templates/start.html",
     "views/createTask",
-    "views/editTask",
+    "views/edit",
     "collections/tasks",
     "collections/courses",
     "models/taskModel",
     "models/courseModel"
-], function(i18n, template, createTaskView, editTaskView, TasksCollection, CoursesCollection, TaskModel, CourseModel) {
+], function(i18n, template, createTaskView, editView, TasksCollection, CoursesCollection, TaskModel, CourseModel) {
     console.log('views/start.js');
     var View = Backbone.View.extend({
         events: {
@@ -102,10 +102,16 @@ define([
                     if (!self.options.role || self.options.role != 3) return;
 
                     var number = event.currentTarget.dataset.number;
-                    console.log(number);
-                    app.router.navigate("editTask/" + collectionName + "/" + number, {
-                        trigger: true
-                    });
+                    if (collectionName === "course") {
+                        app.router.navigate("edit/course/" + number, {
+                            trigger: true
+                        });
+                    }
+                    else if (collectionName === "task") {
+                        app.router.navigate("edit/course/" + self.options.courseNumber + "/task/" + this.number, {
+                            trigger: true
+                        });
+                    }
                 },
             });
         },

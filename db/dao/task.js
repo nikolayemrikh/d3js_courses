@@ -14,11 +14,11 @@ module.exports = {
         Task.find({}).sort({"number": 1}).exec(callback);
     },
     getTask: function(args, callback) {
-        Task.findOne(args.number).exec(callback);
+        Task.findOne({number: args.number}).exec(callback);
     },
     update: function(args, callback) {
         var data = args.data || {};
-        Task.findOneAndUpdate(args.number, {
+        Task.findOneAndUpdate({number: args.number}, {
             '$set': data
         }, {
             'new': true

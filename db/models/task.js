@@ -20,6 +20,42 @@ var Task = new Schema({
     taskInfo: {
         type: String
     },
+    goals: {
+        type: String
+    },
+    jsSolution: {
+        type: String
+    },
+    htmlSolution: {
+        type: String
+    },
+    initialJs: {
+        type: String
+    },
+    jsBlocked: {
+        type: Boolean
+    },
+    initialHtml: {
+        type: String
+    },
+    htmlBlocked: {
+        type: Boolean
+    },
+    initialCss: {
+        type: String
+    },
+    cssBlocked: {
+        type: Boolean
+    },
+    
+    isChallenge: {
+        type: Boolean
+    },
+    // Старые переменные ниже
+    code: {
+        type: String
+    },
+    // taskData заменяется на initialJs
     taskData: {
         helpInfo: {
             type: Schema.Types.Mixed
@@ -34,9 +70,6 @@ var Task = new Schema({
             type: Schema.Types.Mixed
         }
     },
-    code: {
-        type: String
-    }
 });
 var collectionName = 'tasks';
 module.exports = mongoose.model('Task', Task, collectionName);

@@ -3,7 +3,7 @@
 //
 /* global app, Backbone, _, $ */
 
-define(["collections/tasks"], function(Tasks) {
+define(["collections/tasks", "models/courseModel", "models/taskModel"], function(Tasks, CourseModel, TaskModel) {
     console.log('router.js');
     var $body = $('body');
     var $content = $('<div id="content"></div>');
@@ -13,7 +13,7 @@ define(["collections/tasks"], function(Tasks) {
         routes: {
             "start(/:course)": "start",
             "main/:page": "main",
-            "editTask/:collectionName/:page": "editTask",
+            "edit/course/:courseNumber(/task/:taskNumber)": "edit",
             "login": "login",
             "*path": "something"
         },
@@ -25,7 +25,6 @@ define(["collections/tasks"], function(Tasks) {
                 $body.html($content);
                 options = options || {};
                 options.el = $('#content');
-                console.log(options.page)
                 app.content = new View(options);
                 app.content.render();
             }
@@ -111,24 +110,21 @@ define(["collections/tasks"], function(Tasks) {
                 }
             });
         },
-        editTask: function(collectionName, page) {
+        edit: function(courseNumber, taskNumber) {
             var self = this;
             require([
-                "views/editTask"
+                "views/edit"
             ], function(View) {
-                if (page && tasks.findWhere({
-                        number: eval(page)
-                    })) {
-                    self.render(View, {
-                        page: page,
-                        collectionName: collectionName
-                    }, true);
-                }
-                else {
+                if (!courseNumber) {
                     self.navigate("start", {
                         trigger: true
                     });
                 }
+                // Доделать: сделать, чтобы если нет такого номера задания в курсе, то открывалось первое задание по счету number в курсе
+                self.render(View, {
+                    courseNumber: courseNumber,
+                    taskNumber: taskNumber
+                }, true);
             });
         }
     });
