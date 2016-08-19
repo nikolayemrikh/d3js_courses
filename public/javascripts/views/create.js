@@ -46,19 +46,21 @@ define([
             event.preventDefault();
             var form = this.el.querySelector("#create-task-form");
             var newObj = new TaskModel();
+            console.log(this.courseModel)
             newObj.set({
                 isChallange: form.elements.is_challenge.value == 1 ? true : false,
                 taskName: form.elements.task_title.value,
-                number: Number.parseInt(form.elements.task_number_in_course.value)
+                number: Number.parseInt(form.elements.task_number_in_course.value),
+                courseId: this.courseModel.attributes._id
             });
             if (this.tasksCollection.findWhere({number: newObj.attributes.number})) {
                 form.querySelector(".form-number").classList.toggle("has-error");
             } else {
-                this.courseModel.attributes.tasks.push(newObj);
+                /*this.courseModel.attributes.tasks.push(newObj);
                 this.courseModel.set("_id", this.courseNumber);
                 console.log(this.courseModel)
-                this.courseModel.save();
-                //newObj.save();
+                this.courseModel.save();*/
+                newObj.save();
                 this.options.closeDialog();
             }
         }

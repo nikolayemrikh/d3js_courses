@@ -4,6 +4,10 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var Task = new Schema({
+    courseId: {
+        type: Schema.Types.ObjectId,
+        ref: "Course"
+    },
     // Номер
     number: {
         type: Number
