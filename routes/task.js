@@ -34,9 +34,13 @@ router.post('/', function(req, res) {
     };
     task.add(args, function(err, data) {
         if (!err && data) {
-            res.status(200).end();
+            console.log(err, data)
+            //res.status(200).end();
+            res.json(data);
         }
         else {
+            console.log(err, data)
+            //res.status(400).end();
             res.status(400).end();
         }
     });

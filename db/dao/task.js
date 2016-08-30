@@ -16,7 +16,10 @@ module.exports = {
                 task.save(function(err) {
                     if (err) return callback(err);
                     course.tasks.push(task);
-                    course.save(callback);
+                    //course.save(callback);
+                    course.save(function(err) {
+                        if (!err) callback(null, task);
+                    });
                 });
             });
         });

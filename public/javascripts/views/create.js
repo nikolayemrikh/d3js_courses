@@ -43,6 +43,7 @@ define([
             this.remove();
         },
         send: function(event) {
+            var self = this;
             event.preventDefault();
             var form = this.el.querySelector("#create-task-form");
             var newObj = new TaskModel();
@@ -56,12 +57,12 @@ define([
             if (this.tasksCollection.findWhere({number: newObj.attributes.number})) {
                 form.querySelector(".form-number").classList.toggle("has-error");
             } else {
-                /*this.courseModel.attributes.tasks.push(newObj);
-                this.courseModel.set("_id", this.courseNumber);
-                console.log(this.courseModel)
-                this.courseModel.save();*/
-                newObj.save();
-                this.options.closeDialog();
+                newObj.save(null, {
+                    success: function(model, response, options) {
+                        console.log(model, response)
+                        self.options.closeDialog();
+                    }
+                });
             }
         }
     });

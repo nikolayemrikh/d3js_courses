@@ -139,6 +139,7 @@ define([
                 this.courseModel.fetch({
                     success: function(model, response, options) {
                         var tasks = model.attributes.tasks;
+                        console.log(model)
                         self.tasksCollection.add(tasks);
                     }
                 });
