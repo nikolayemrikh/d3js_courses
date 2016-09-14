@@ -78,7 +78,7 @@ define(["collections/tasks", "models/courseModel", "models/taskModel"], function
                         var role = model.get("role");
                         if (role != 3) role = null;
                         self.render(View, {
-                            courseNumber: course,
+                            courseId: course,
                             profile: model,
                             role: role
                         }, true);

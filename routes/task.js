@@ -1,5 +1,7 @@
 var express = require('express');
-var router = express.Router({mergeParams: true});
+var router = express.Router({
+    mergeParams: true
+});
 var task = require('../db/dao/task');
 // List all task in course
 router.get('/', function(req, res) {
@@ -18,34 +20,35 @@ router.get('/', function(req, res) {
 });
 // Get task by id
 router.get('/:taskId', function(req, res, next) {
-   var args = {
-       courseId: req.params.courseId,
-       taskId: req.params.taskId
-   };
-   task.getTask(args, function(err, data) {
-       if (!err && data) {
+    var args = {
+        courseId: req.params.courseId,
+        taskId: req.params.taskId
+    };
+    task.getTask(args, function(err, data) {
+        if (!err && data) {
             res.json(data);
         }
         else {
             res.status(400).end();
         }
-   });
+    });
 });
 // Create new task
 router.post('/', function(req, res, next) {
     var args = {
+        courseId: req.params.courseId,
         data: req.body
     };
     task.add(args, function(err, data) {
         if (!err && data) {
             console.log(err, data)
-            //res.status(200).end();
+                //res.status(200).end();
             res.json(data);
             //res.status(200).end();
         }
         else {
             console.log(err, data)
-            //res.status(400).end();
+                //res.status(400).end();
             res.status(400).end();
         }
     });
@@ -72,15 +75,17 @@ router.put('/:number', function(req, res, next) {
 // Remove task
 router.delete('/:taskId', function(req, res, next) {
     var args = {
-       taskId: req.params.taskId
-   };
-   task.delete(args, function(err, data) {
-       if (!err && data) {
+        courseId: req.params.courseId,
+        taskId: req.params.taskId
+    };
+    console.log(args)
+    task.delete(args, function(err, data) {
+        if (!err && data) {
             res.json(data);
         }
         else {
             res.status(400).end();
         }
-   });
+    });
 });
 module.exports = router;

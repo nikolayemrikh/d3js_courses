@@ -33,7 +33,7 @@ define([
             };
             app.profile.fetch();
             var collectionName, completedItems;
-            if (!this.options.courseNumber) {
+            if (!this.options.courseId) {
                 collectionName = "course";
                 completedItems = this.options.profile.get("completedCourses");
             }
@@ -55,6 +55,7 @@ define([
                     this.listenTo(this.model, 'change', this.render);
                     this.listenTo(this.model, 'remove', this.remove);
                     this.listenTo(this.model, 'destroy', this.remove);
+                    this.model.idAttribute = "taskId";
                 },
                 render: function() {
                     console.log(this.model)
@@ -62,21 +63,26 @@ define([
                     var data;
                     if (collectionName === "course") {
                         data = {
-                            _id: this.model.attributes._id,
-                            itemId: this.model.attributes.courseId,
-                            name: this.model.attributes.name,
-                            description: this.model.attributes.description
+                            //_id: this.model.attributes._id,
+                            item: {
+                                courseId: this.model.attributes.courseId,
+                                name: this.model.attributes.name,
+                                description: this.model.attributes.description
+                            }
                         };
                     }
                     else if (collectionName === "task") {
                         data = {
-                            _id: this.model.attributes._id,
-                            itemId: this.model.attributes.taskId,
-                            name: this.model.attributes.taskName,
-                            description: this.model.attributes.taskDescription
+                            item: {
+                                taskId: this.model.attributes.taskId,
+                                courseId: this.model.attributes.courseId,
+                                name: this.model.attributes.taskName,
+                                description: this.model.attributes.taskDescription
+                            }
                         };
                     }
                     data.completedItems = completedItems;
+                    console.log(data)
 
                     this.$el.html(this.tpl(data));
                     if (self.options.role && self.options.role == 3) {
@@ -103,14 +109,14 @@ define([
                     event.stopPropagation();
                     if (!self.options.role || self.options.role != 3) return;
 
-                    var id = event.currentTarget.dataset.id;
+                    var model = this.model;
                     if (collectionName === "course") {
-                        app.router.navigate("edit/course/" + id, {
+                        app.router.navigate("edit/course/" + model.attributes.courseId, {
                             trigger: true
                         });
                     }
                     else if (collectionName === "task") {
-                        app.router.navigate("edit/course/" + self.options.courseNumber + "/task/" + this.number, {
+                        app.router.navigate("edit/course/" + self.options.courseId + "/task/" + model.attributes.taskId, {
                             trigger: true
                         });
                     }
@@ -119,19 +125,7 @@ define([
                     event.preventDefault();
                     event.stopPropagation();
                     if (!self.options.role || self.options.role != 3) return;
-
-                    var _id = event.currentTarget.dataset._id;
-                    var model;
-                    if (collectionName === "course") {
-                        model = new CourseModel({
-                            courseId: _id
-                        });
-                    }
-                    else if (collectionName === "task") {
-                        model = new TaskModel({
-                            taskId: _id
-                        });
-                    }
+                    var model = this.model;
                     this.dialog = new BootstrapDialog({
                         draggable: true,
                         title: "Удаление",
@@ -143,13 +137,11 @@ define([
                             action: function(dialogItself) {
                                 model.destroy({
                                     success: function(model, response, options) {
-                                        console.log(model, response)
                                         dialogItself.close();
-                                        self.render();
+
                                     },
                                     error: function(model, xhr, options) {
                                         console.log("Не сохранено", model, xhr, options);
-                                        //self.options.closeDialog();
                                     }
                                 });
                             }
@@ -174,25 +166,36 @@ define([
             var data = {
                 i18n: i18n,
                 collectionName: this.collectionName,
-                courseNumber: this.options.courseNumber
+                courseId: this.options.courseId
             };
             this.$el.html(tpl(data));
             if (this.options.role == 3) {
                 this.$(".btn-create-item").css("display", "block");
             }
             if (this.collectionName === "task") {
+                //Получить курс и задания
                 this.courseModel = new CourseModel({
-                    courseId: this.options.courseNumber
+                    courseId: this.options.courseId
                 });
-                this.tasksCollection = new TasksCollection();
+                var TaskCollection = Backbone.Collection.extend({
+                    url: "/course/" + this.options.courseId + "/task/",
+                });
+                //this.tasksCollection = new TasksCollection();
+                this.tasksCollection = new TaskCollection();
                 this.listenTo(this.tasksCollection, 'add', this.appendCourse);
                 this.courseModel.fetch({
                     success: function(model, response, options) {
                         var tasks = model.attributes.tasks;
-                        console.log(model)
                         self.tasksCollection.add(tasks);
                     }
                 });
+                // Получить только задания курса
+                /*var TaskCollection = Backbone.Collection.extend({
+                    url: "/course/" + this.options.courseId + "/task/",
+                });
+                this.tasksCollection = new TaskCollection();
+                this.listenTo(this.tasksCollection, 'add', this.appendCourse);
+                self.tasksCollection.fetch();*/
             }
             else if (this.collectionName === "course") {
                 this.coursesCollection = new CoursesCollection();
@@ -234,21 +237,19 @@ define([
                 draggable: true
             });
             this.dialog.realize();
-            var obj;
+            var args;
             if (this.collectionName === "task") {
-                obj = {
+                args = {
                     collectionName: "task",
-                    collection: this.tasksCollection,
-                    courseModel: this.courseModel
+                    courseId: this.options.courseId
                 };
             }
             else if (this.collectionName === "course") {
-                obj = {
-                    collectionName: "course",
-                    collection: this.coursesCollection
+                args = {
+                    collectionName: "course"
                 };
             }
-            self.view.createView.setElement(this.dialog.getModalDialog()).render(obj);
+            self.view.createView.setElement(this.dialog.getModalDialog()).render(args);
             this.dialog.open();
         },
         closeTaskDialog: function() {

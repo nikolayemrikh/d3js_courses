@@ -21,16 +21,14 @@ define([
             // Templates
             this.templates = _.parseTemplate(template);
         },
-        render: function(obj) {
+        render: function(args) {
             var self = this;
-            if (obj.collectionName == "task") {
+            if (args.collectionName == "task") {
                 this.collectionName = "task";
-                this.collection = obj.collection;
-                this.courseModel = obj.courseModel;
+                this.courseId = args.courseId;
             }
             else {
                 this.collectionName = "course";
-                this.collection = obj.collection;
             }
             var data = {
                 i18n: i18n,
@@ -50,14 +48,19 @@ define([
             var form = this.el.querySelector("#create-task-form");
             var newObj;
             if (this.collectionName == "task") {
+                var TaskModel = Backbone.Model.extend({
+                    urlRoot: "/course/" + this.courseId + "/task/",
+                    idAttribute: "taskId"
+                });
                 newObj = new TaskModel();
                 newObj.set({
                     isChallange: form.elements.is_challenge.value == 1 ? true : false,
                     taskName: form.elements.task_title.value,
-                    courseId: this.courseModel.attributes.courseId,
+                    courseId: this.courseId,
                     //Временно зададим номер, потому что нельзя послать в бекбоне модель с айди..
                     number: Number.parseInt(form.elements.task_number_in_course.value)
                 });
+                console.log(newObj)
             }
             else if (this.collectionName == "course") {
                 newObj = new CourseModel();
@@ -66,23 +69,18 @@ define([
                     number: Number.parseInt(form.elements.course_number.value),
                 });
             }
-            if (this.collection.findWhere({
-                    taskId: newObj.attributes.number
-                })) {
-                form.querySelector(".form-number").classList.toggle("has-error");
-            }
-            else {
-                newObj.save(null, {
-                    success: function(model, response, options) {
-                        console.log(model, response)
-                        self.options.closeDialog();
-                    },
-                    error: function(model, xhr, options) {
-                        console.log("Не сохранено", model, xhr, options);
-                        //self.options.closeDialog();
-                    }
-                });
-            }
+            newObj.save(null, {
+                success: function(model, response, options) {
+                    console.log(model, response)
+                    self.options.closeDialog();
+                },
+                error: function(model, xhr, options) {
+                    console.log("Не сохранено", model, xhr, options);
+                    //self.options.closeDialog();
+                    form.querySelector(".form-number").classList.toggle("has-error");
+                }
+            });
+
         }
     });
     return View;

@@ -2,11 +2,12 @@ var Task = require('../models/task');
 var Course = require('../models/course');
 module.exports = {
     add: function(args, callback) {
-        if (!args.data.courseId) callback(new Error("couresId required"))
+        if (!args.courseId) callback(new Error("courseId required"))
         Course.findOne({
-            courseId: args.data.courseId
+            courseId: args.courseId
         }).populate("tasks", "taskId").exec(function(err, course) {
             if (err || !course) return callback(err);
+            console.log(course)
             var clientNumber;
             if (args.data.number) {
                 clientNumber = Number.parseInt(args.data.number);
@@ -28,7 +29,7 @@ module.exports = {
                 if (err) return callback(err);
                 var task = new Task({
                     taskId: clientNumber ? clientNumber : maxNumber + 1,
-                    courseId: args.data.courseId,
+                    courseId: args.courseId,
                     course: course._id,
                     isChallenge: args.data.isChallenge,
                     taskName: args.data.taskName,
@@ -36,9 +37,7 @@ module.exports = {
                 task.save(function(err) {
                     if (err) return callback(err);
                     course.tasks.push(task);
-                    course.save(function(err) {
-                        if (!err) callback(null, task);
-                    });
+                    course.save(callback);
                 });
             });
         });
@@ -80,15 +79,20 @@ module.exports = {
         });
     },
     delete: function(args, callback) {
-        if (!args.courseId) {
-            Task.findByIdAndRemove(args.taskId).exec(callback);
-        } else {
-            Task.findOneAndRemove({courseId: args.courseId, taskId: args.taskId}).exec(callback);
-        }
-        /*Task.findByIdAndRemove(args.id, function(err, task) {
-            console.log(err, task)
-            if (err) return callback(err);
-            callback(null, task)
-        });*/
+        if (!args.courseId) callback(new Error("courseId required"));
+        Course.findOne({
+            courseId: args.courseId
+        }).exec(function(err, course) {
+            if (err || !course) return callback(err);
+            course.save(function(err) {
+                if (err) return callback(err);
+                var pos = course.tasks.indexOf(args.taskId);
+                course.tasks.splice(pos, 1);
+                Task.findOneAndRemove({courseId: args.courseId, taskId: args.taskId}).exec(function(err) {
+                    if (err) return callback(err);
+                    course.save(callback);
+                });
+            });
+        });
     }
 }

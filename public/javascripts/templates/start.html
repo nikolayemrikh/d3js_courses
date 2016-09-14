@@ -50,7 +50,7 @@
     <!-- <a href="#main" type="button" class="start-btn btn btn-success">Let's go!</a> -->
     <div class="row">
         <div calss="row">
-            <h2 class="col-md-6 col-xs-6"><% if (collectionName === "course") {%><%-i18n.t('start.title')%><%} else if (collectionName === "task") {%>Задания курса #<%-courseNumber%><%}%></h2>
+            <h2 class="col-md-6 col-xs-6"><% if (collectionName === "course") {%><%-i18n.t('start.title')%><%} else if (collectionName === "task") {%>Задания курса #<%-courseId%><%}%></h2>
             <div class="col-md-6 col-xs-6">
                 <div class="btn-group btn-controls" role="group" aria-label="Кнопоньки">
                     <%if (collectionName === "task") {%><button href="#" class="btn btn-default btn-back">Назад к курсам</button><%}%>
@@ -77,25 +77,25 @@
 </script>
 <script type="text/template" id="course-td-tpl">
     <td>
-        <h3><%- itemId %></h3>
+        <h3><%- item.taskId ? item.taskId : item.courseId %></h3>
     </td>
     <td>
         <div class="row">
             <div class="col-md-8 col-xs-8">
-                <h3><%- name %></h3>
-                <p><%= description %></p>
+                <h3><%- item.name %></h3>
+                <p><%= item.description %></p>
             </div>
             <div class="col-md-2 col-xs-2">
-                <button type="button" class="btn btn-default btn-controls btn-delete-item" data-itemId="<%- itemId %>" data-_id="<%- _id %>">
+                <button type="button" class="btn btn-default btn-controls btn-delete-item">
                     <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
                 </button>
-                <button type="button" class="btn btn-default btn-controls btn-edit-item" data-itemId="<%- itemId %>">
+                <button type="button" class="btn btn-default btn-controls btn-edit-item">
                     <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
                 </button>
             </div>
         </div>
     </td>
-    <td><span class="label label-success"><% if (_.indexOf(completedItems, _id) != -1) {
+    <td><span class="label label-success"><% if (_.indexOf(completedItems, item.taskId ? item.taskId : item.courseId) != -1) {
             %> Пройдено <%
         }%></span></td>
     <td><a href="#" class="btn btn-default start-course-btn">Начать</a></td>

@@ -33,7 +33,7 @@ module.exports = {
             courseId: args.courseId
         }).populate({
             path: "tasks",
-            select: "taskDescription taskName taskId",
+            select: "taskDescription taskName taskId courseId",
             options: {
                 sort: {
                     "taskId": 1
