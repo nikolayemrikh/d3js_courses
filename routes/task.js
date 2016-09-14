@@ -41,7 +41,7 @@ router.post('/', function(req, res, next) {
     };
     task.add(args, function(err, data) {
         if (!err && data) {
-            console.log(err, data)
+            console.log(err, data, "kek")
                 //res.status(200).end();
             res.json(data);
             //res.status(200).end();

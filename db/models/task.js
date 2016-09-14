@@ -8,7 +8,8 @@ var Task = new Schema({
         type: Number
     },
     courseId: {
-        type: Number
+        type: Number,
+        unique: true
     },
     course: {
         type: Schema.Types.ObjectId,
@@ -17,9 +18,6 @@ var Task = new Schema({
     // Название задания
     taskName: {
         type: String
-    },
-    number: {
-        type: Number
     },
     // Краткое описание задания
     taskDescription: {

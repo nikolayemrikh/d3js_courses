@@ -5,14 +5,12 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var Course = new Schema({
     courseId: {
-        type: Number
+        type: Number,
+        unique: true
     },
     // Имя курса
     name: {
         type: String
-    },
-    number: {
-        type: Number
     },
     // Задания в курсе
     tasks: [{

@@ -34,10 +34,14 @@ module.exports = {
                     isChallenge: args.data.isChallenge,
                     taskName: args.data.taskName,
                 });
-                task.save(function(err) {
+                console.log(task)
+                task.save(function(err, task) {
                     if (err) return callback(err);
                     course.tasks.push(task);
-                    course.save(callback);
+                    course.save(function(err) {
+                        if (err) return callback(err);
+                        callback(null, task);
+                    });
                 });
             });
         });
@@ -87,9 +91,9 @@ module.exports = {
             course.save(function(err) {
                 if (err) return callback(err);
                 var pos = course.tasks.indexOf(args.taskId);
-                course.tasks.splice(pos, 1);
                 Task.findOneAndRemove({courseId: args.courseId, taskId: args.taskId}).exec(function(err) {
                     if (err) return callback(err);
+                    course.tasks.splice(pos, 1);
                     course.save(callback);
                 });
             });

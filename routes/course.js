@@ -49,9 +49,9 @@ router.post('/', function(req, res, next) {
     });
 });
 // Update course
-router.put('/:number', function(req, res, next) {
+router.put('/:courseId', function(req, res, next) {
     var args = {
-        number: req.params.number,
+        number: req.params.courseId,
         data: req.body
     };
     course.update(args, function(err, data) {
@@ -64,10 +64,11 @@ router.put('/:number', function(req, res, next) {
         }
     });
 });
-// Remove task
-router.delete('/:id', function(req, res, next) {
+// Remove course
+router.delete('/:courseId', function(req, res, next) {
+    console.log('tyt')
     var args = {
-       id: req.params.id
+       courseId: req.params.courseId
    };
    course.delete(args, function(err, data) {
        if (!err && data) {
