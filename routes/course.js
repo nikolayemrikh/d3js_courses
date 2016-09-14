@@ -1,8 +1,10 @@
 var express = require('express');
 var router = express.Router();
 var course = require('../db/dao/course');
+var taskRouter = require('./task');
+router.use('/:courseId/task', taskRouter);
 // List all course in course
-router.get('/', function(req, res) {
+router.get('/', function(req, res, next) {
     var args = {};
     course.list(args, function(err, data) {
         if (!err && data) {
@@ -18,9 +20,9 @@ router.get('/', function(req, res) {
     });
 });
 // Get course by number
-router.get('/:number', function(req, res) {
+router.get('/:courseId', function(req, res) {
     var args = {
-        number: req.params.number
+        courseId: req.params.courseId
     };
     course.getCourse(args, function(err, data) {
         if (!err && data) {
@@ -32,13 +34,14 @@ router.get('/:number', function(req, res) {
     });
 });
 // Create new course
-router.post('/', function(req, res) {
+router.post('/', function(req, res, next) {
     var args = {
         data: req.body
     };
     course.add(args, function(err, data) {
         if (!err && data) {
-            res.status(200).end();
+            //res.status(200).end();
+            res.json(data);
         }
         else {
             res.status(400).end();
@@ -46,7 +49,7 @@ router.post('/', function(req, res) {
     });
 });
 // Update course
-router.put('/:number', function(req, res) {
+router.put('/:number', function(req, res, next) {
     var args = {
         number: req.params.number,
         data: req.body
@@ -60,5 +63,19 @@ router.put('/:number', function(req, res) {
             res.status(400).end();
         }
     });
+});
+// Remove task
+router.delete('/:id', function(req, res, next) {
+    var args = {
+       id: req.params.id
+   };
+   course.delete(args, function(err, data) {
+       if (!err && data) {
+            res.json(data);
+        }
+        else {
+            res.status(400).end();
+        }
+   });
 });
 module.exports = router;

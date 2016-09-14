@@ -4,17 +4,22 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var Task = new Schema({
+    taskId: {
+        type: Number
+    },
     courseId: {
+        type: Number
+    },
+    course: {
         type: Schema.Types.ObjectId,
         ref: "Course"
-    },
-    // Номер
-    number: {
-        type: Number
     },
     // Название задания
     taskName: {
         type: String
+    },
+    number: {
+        type: Number
     },
     // Краткое описание задания
     taskDescription: {

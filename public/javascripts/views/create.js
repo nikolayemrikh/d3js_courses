@@ -4,8 +4,9 @@
 define([
     "i18n",
     "text!templates/create.html",
-    "models/taskModel"
-], function(i18n, template, TaskModel) {
+    "models/taskModel",
+    "models/courseModel"
+], function(i18n, template, TaskModel, CourseModel) {
     console.log('views/create.js');
     var View = Backbone.View.extend({
         className: "createPopup",
@@ -20,23 +21,24 @@ define([
             // Templates
             this.templates = _.parseTemplate(template);
         },
-        render: function(courseNumber, tasksCollection, courseModel) {
+        render: function(obj) {
             var self = this;
-            var collectionName;
-            if (courseNumber) {
-                this.courseNumber = courseNumber;
-                this.tasksCollection = tasksCollection;
-                this.courseModel = courseModel;
-                collectionName = "task";
-            } else {
-                collectionName = "course";
+            if (obj.collectionName == "task") {
+                this.collectionName = "task";
+                this.collection = obj.collection;
+                this.courseModel = obj.courseModel;
+            }
+            else {
+                this.collectionName = "course";
+                this.collection = obj.collection;
             }
             var data = {
-                i18n: i18n
+                i18n: i18n,
+                collectionName: this.collectionName
             };
             var tpl = _.template(this.templates['main-tpl']);
             this.$el.html(tpl(data));
-            
+
             return this;
         },
         destroy: function() {
@@ -46,21 +48,38 @@ define([
             var self = this;
             event.preventDefault();
             var form = this.el.querySelector("#create-task-form");
-            var newObj = new TaskModel();
-            console.log(this.courseModel)
-            newObj.set({
-                isChallange: form.elements.is_challenge.value == 1 ? true : false,
-                taskName: form.elements.task_title.value,
-                number: Number.parseInt(form.elements.task_number_in_course.value),
-                courseId: this.courseModel.attributes._id
-            });
-            if (this.tasksCollection.findWhere({number: newObj.attributes.number})) {
+            var newObj;
+            if (this.collectionName == "task") {
+                newObj = new TaskModel();
+                newObj.set({
+                    isChallange: form.elements.is_challenge.value == 1 ? true : false,
+                    taskName: form.elements.task_title.value,
+                    courseId: this.courseModel.attributes.courseId,
+                    //Временно зададим номер, потому что нельзя послать в бекбоне модель с айди..
+                    number: Number.parseInt(form.elements.task_number_in_course.value)
+                });
+            }
+            else if (this.collectionName == "course") {
+                newObj = new CourseModel();
+                newObj.set({
+                    name: form.elements.course_name.value,
+                    number: Number.parseInt(form.elements.course_number.value),
+                });
+            }
+            if (this.collection.findWhere({
+                    taskId: newObj.attributes.number
+                })) {
                 form.querySelector(".form-number").classList.toggle("has-error");
-            } else {
+            }
+            else {
                 newObj.save(null, {
                     success: function(model, response, options) {
                         console.log(model, response)
                         self.options.closeDialog();
+                    },
+                    error: function(model, xhr, options) {
+                        console.log("Не сохранено", model, xhr, options);
+                        //self.options.closeDialog();
                     }
                 });
             }

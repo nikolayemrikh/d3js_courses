@@ -1,6 +1,7 @@
 define([], function() {
     var Model = Backbone.Model.extend({
-        urlRoot: "/task"
+        urlRoot: "/task",
+        idAttribute: "taskId"
     });
     return Model;
 })

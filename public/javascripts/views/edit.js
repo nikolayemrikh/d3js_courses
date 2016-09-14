@@ -11,7 +11,8 @@ define([
     var View = Backbone.View.extend({
         className: "editTask",
         events: {
-            "click .btn-prev": "goToStart"
+            "click .btn-prev": "goToStart",
+            "submit #edit-model-form": "send"
         },
         initialize: function(options) {
             // Variables
@@ -29,8 +30,8 @@ define([
             }
             else {
                 this.collectionName = "course";
-                this.Model = CourseModel;
                 this.modelNumber = this.courseNumber;
+                this.Model = CourseModel
             }
             this.model = new this.Model({
                 _id: this.modelNumber
@@ -40,6 +41,7 @@ define([
             var self = this;
             this.model.fetch({
                 success: function(model, response, options) {
+                    console.log(model, response, options)
                     var data = {
                         i18n: i18n,
                         collectionName: self.collectionName,
@@ -67,6 +69,40 @@ define([
                     trigger: true
                 });
             }
+        },
+        send: function(event) {
+            var self = this;
+            event.preventDefault();
+            event.stopPropagation();
+            var form = this.el.querySelector("#edit-model-form");
+            if (this.collectionName == "task") {
+                this.model.set({
+                    isChallange: form.elements.is_challenge.value == 1 ? true : false,
+                    taskName: form.elements.task_title.value,
+                    number: Number.parseInt(form.elements.task_number_in_course.value),
+                    courseId: this.courseModel.attributes._id
+                });
+            }
+            else if (this.collectionName == "course") {
+                this.model.set({
+                    name: form.elements.course_name.value,
+                    number: Number.parseInt(form.elements.course_number.value),
+                });
+            }
+            /*if (this.collection.findWhere({
+                    number: newObj.attributes.number
+                })) {
+                form.querySelector(".form-number").classList.toggle("has-error");
+            }*/
+            this.model.save(null, {
+                success: function(model, response, options) {
+                    console.log(model, response)
+                },
+                error: function(model, xhr, options) {
+                    console.log("Не сохранено", model, xhr, options);
+                    //self.options.closeDialog();
+                }
+            });
         }
     });
     return View;

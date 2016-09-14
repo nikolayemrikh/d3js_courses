@@ -41,12 +41,14 @@ define([
                 collectionName = "task";
                 completedItems = this.options.profile.get("completedTasks");
             }
+            console.log(completedItems)
             this.collectionName = collectionName;
             this.courseView = Backbone.View.extend({
                 tagName: "tr",
                 events: {
                     "click .start-course-btn": "start",
                     "click .btn-edit-item": "editItem",
+                    "click .btn-delete-item": "deleteItem",
                 },
                 initialize: function() {
                     this.tpl = _.template(self.templates['course-td-tpl']);
@@ -61,7 +63,7 @@ define([
                     if (collectionName === "course") {
                         data = {
                             _id: this.model.attributes._id,
-                            number: this.model.attributes.number,
+                            itemId: this.model.attributes.courseId,
                             name: this.model.attributes.name,
                             description: this.model.attributes.description
                         };
@@ -69,7 +71,7 @@ define([
                     else if (collectionName === "task") {
                         data = {
                             _id: this.model.attributes._id,
-                            number: this.model.attributes.number,
+                            itemId: this.model.attributes.taskId,
                             name: this.model.attributes.taskName,
                             description: this.model.attributes.taskDescription
                         };
@@ -101,9 +103,9 @@ define([
                     event.stopPropagation();
                     if (!self.options.role || self.options.role != 3) return;
 
-                    var number = event.currentTarget.dataset.number;
+                    var id = event.currentTarget.dataset.id;
                     if (collectionName === "course") {
-                        app.router.navigate("edit/course/" + number, {
+                        app.router.navigate("edit/course/" + id, {
                             trigger: true
                         });
                     }
@@ -112,6 +114,54 @@ define([
                             trigger: true
                         });
                     }
+                },
+                deleteItem: function(event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    if (!self.options.role || self.options.role != 3) return;
+
+                    var _id = event.currentTarget.dataset._id;
+                    var model;
+                    if (collectionName === "course") {
+                        model = new CourseModel({
+                            courseId: _id
+                        });
+                    }
+                    else if (collectionName === "task") {
+                        model = new TaskModel({
+                            taskId: _id
+                        });
+                    }
+                    this.dialog = new BootstrapDialog({
+                        draggable: true,
+                        title: "Удаление",
+                        message: "Подтвердите удаление",
+                        buttons: [{
+                            label: "Удалить",
+                            cssClass: "btn-danger",
+                            icon: "glyphicon glyphicon-remove",
+                            action: function(dialogItself) {
+                                model.destroy({
+                                    success: function(model, response, options) {
+                                        console.log(model, response)
+                                        dialogItself.close();
+                                        self.render();
+                                    },
+                                    error: function(model, xhr, options) {
+                                        console.log("Не сохранено", model, xhr, options);
+                                        //self.options.closeDialog();
+                                    }
+                                });
+                            }
+                        }, {
+                            label: 'Закрыть',
+                            action: function(dialogItself) {
+                                dialogItself.close();
+                            }
+                        }]
+                    });
+                    this.dialog.realize();
+                    this.dialog.open();
                 },
             });
         },
@@ -132,7 +182,7 @@ define([
             }
             if (this.collectionName === "task") {
                 this.courseModel = new CourseModel({
-                    _id: this.options.courseNumber
+                    courseId: this.options.courseNumber
                 });
                 this.tasksCollection = new TasksCollection();
                 this.listenTo(this.tasksCollection, 'add', this.appendCourse);
@@ -143,7 +193,8 @@ define([
                         self.tasksCollection.add(tasks);
                     }
                 });
-            } else if (this.collectionName === "course") {
+            }
+            else if (this.collectionName === "course") {
                 this.coursesCollection = new CoursesCollection();
                 this.listenTo(this.coursesCollection, 'add', this.appendCourse);
                 this.coursesCollection.fetch();
@@ -183,10 +234,21 @@ define([
                 draggable: true
             });
             this.dialog.realize();
+            var obj;
             if (this.collectionName === "task") {
-                var courseNumber = this.options.courseNumber;
+                obj = {
+                    collectionName: "task",
+                    collection: this.tasksCollection,
+                    courseModel: this.courseModel
+                };
             }
-            self.view.createView.setElement(this.dialog.getModalDialog()).render(courseNumber, this.tasksCollection, this.courseModel);
+            else if (this.collectionName === "course") {
+                obj = {
+                    collectionName: "course",
+                    collection: this.coursesCollection
+                };
+            }
+            self.view.createView.setElement(this.dialog.getModalDialog()).render(obj);
             this.dialog.open();
         },
         closeTaskDialog: function() {

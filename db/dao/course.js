@@ -3,9 +3,21 @@ var Task = require("./task");
 module.exports = {
     add: function(args, callback) {
         var course = new Course({
-            name: args.data.name
+            name: args.data.name,
+            number: args.data.number,
+            //Работают кастомные id
+            //_id: "coursetest"
         });
-        course.save(callback);
+        course.save(function(err) {
+            if (err) return callback(err);
+            callback(null, course);
+        });
+        //Проверим, есть ли курс с таким номером
+        /*Course.findOne({
+            number: args.data.number
+        }, function(err, course) {
+            console.log(err, course);
+        });*/
     },
     list: function(args, callback) {
         //Забираем из модели Task только нужные для #start поля
@@ -17,20 +29,28 @@ module.exports = {
         }).exec(callback);*/
     },
     getCourse: function(args, callback) {
-        //Course.findById(args.taskId).populate({
         Course.findOne({
-            number: args.number
+            courseId: args.courseId
         }).populate({
             path: "tasks",
-            select: "taskDescription taskName number",
+            select: "taskDescription taskName taskId",
             options: {
                 sort: {
-                    "number": 1
+                    "taskId": 1
                 }
             }
-        }).exec(callback);
+        }).exec(function(err, course) {
+            if (err) return callback(err);
+            callback(null, course)
+        });
     },
-    update: function(args, callback) {
+    delete: function(args, callback) {
+        Course.findByIdAndRemove(args.id, function(err, course) {
+            if (err) return callback(err);
+            callback(null, course)
+        });
+    },
+    /*update: function(args, callback) {
         var data = args.data || {};
         delete data._id;
         //delete data.tasks;
@@ -48,7 +68,7 @@ module.exports = {
                 if (err) return callback(err);
                 course.tasks.push(task);
             });
-        });
+        });*/
         /*
         console.log(data)
         Course.findOneAndUpdate({number: data.number}, {
@@ -59,7 +79,7 @@ module.exports = {
         }, function(err, course) {
             callback(err, course);
             //course.save();
-        });*/
+        });
 
-    }
+    }*/
 }
