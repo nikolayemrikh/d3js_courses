@@ -7,32 +7,20 @@ module.exports = {
             courseId: args.courseId
         }).populate("tasks", "taskId").exec(function(err, course) {
             if (err || !course) return callback(err);
-            console.log(course)
-            var clientNumber;
-            if (args.data.number) {
-                clientNumber = Number.parseInt(args.data.number);
-            }
-            var maxNumber;
-            if (course.tasks[0]) {
-                maxNumber = course.tasks[0].taskId;
-                for (var i = 1; i < course.tasks.length; i++) {
-                    var task = course.tasks[i];
-                    if (task.taskId == clientNumber) clientNumber = null;
-                    if (task.taskId > maxNumber) maxNumber = task.taskId;
-                }
-            }
-            else {
-                maxNumber = 1;
+            for (var i = 0; i < course.tasks.length; i++) {
+                var task = course.tasks[i];
+                if (args.data.number == task.taskId) callback(new Error("Задание с таким номером уже существует в курсе"));
             }
 
             course.save(function(err) {
                 if (err) return callback(err);
                 var task = new Task({
-                    taskId: clientNumber ? clientNumber : maxNumber + 1,
+                    taskId: args.data.number,
                     courseId: args.courseId,
                     course: course._id,
                     isChallenge: args.data.isChallenge,
                     taskName: args.data.taskName,
+                    taskDescription: args.data.taskDescription
                 });
                 console.log(task)
                 task.save(function(err, task) {
@@ -50,7 +38,7 @@ module.exports = {
         if (args.courseId) {
             Course.findOne({
                 courseId: args.courseId
-            }).populate("tasks").exec(function(err, course) {
+            }).populate("tasks").sort({"taskId": 1}).exec(function(err, course) {
                 console.log(course)
                 if (err) return callback(err);
                 callback(null, course.tasks)
@@ -58,42 +46,83 @@ module.exports = {
         }
         else {
             Task.find({}).sort({
-                "number": 1
+                "taskId": 1
             }).exec(callback);
         }
     },
     getTask: function(args, callback) {
         if (!args.courseId) {
             Task.findById(args.taskId).exec(callback);
-        } else {
-            Task.findOne({courseId: args.courseId, taskId: args.taskId}).exec(callback);
+        }
+        else {
+            Task.findOne({
+                courseId: args.courseId,
+                taskId: args.taskId
+            }).exec(callback);
         }
     },
     update: function(args, callback) {
         var data = args.data || {};
+        /*Course.findOne({
+            courseId: args.data.courseId
+        }).populate("tasks", "taskId").exec(function(err, course) {
+            if (err) return callback(err);
+            var taskIds = course.tasks.map(function(task) {
+                return task.taskId;
+            })
+            if (taskIds.indexOf(args.data.taskId) != -1) return callback(new Error("Задание с таким номером уже существует"));
+        });
         Task.findOneAndUpdate({
-            number: args.number
+            _id: args._id
         }, {
             '$set': data
         }, {
             'new': true
         }, function(err, task) {
-            callback(err, task);
-            task.save();
+            if (err) return callback(err);
+            callback(null, task);
+            //task.save();
+        });*/
+        Task.findById(args._id, function(err, task) {
+            if (err) return callback(err);
+            Course.findOne({
+                courseId: args.data.courseId
+            }).populate("tasks", "taskId").exec(function(err, course) {
+                if (err) return callback(err);
+                var taskIds = course.tasks.map(function(task) {
+                    return task.taskId;
+                });
+                if (task.taskId != args.data.taskId && taskIds.indexOf(args.data.taskId) != -1) return callback(new Error("Задание с таким номером уже существует в курсе"));
+                Task.findOneAndUpdate({
+                    _id: args._id
+                }, {
+                    '$set': data
+                }, {
+                    'new': true
+                }, function(err, task) {
+                    if (err) return callback(err);
+                    callback(null, task);
+                    //task.save();
+                });
+            });
         });
     },
     delete: function(args, callback) {
         if (!args.courseId) callback(new Error("courseId required"));
         Course.findOne({
             courseId: args.courseId
-        }).exec(function(err, course) {
+        }).populate("tasks", "taskId").exec(function(err, course) {
             if (err || !course) return callback(err);
             course.save(function(err) {
                 if (err) return callback(err);
-                var pos = course.tasks.indexOf(args.taskId);
-                Task.findOneAndRemove({courseId: args.courseId, taskId: args.taskId}).exec(function(err, task) {
+                for (var i = 0; i < course.tasks.length; i++) {
+                    if (course.tasks[i].taskId == args.taskId) course.tasks.splice(i, 1);
+                }
+                Task.findOneAndRemove({
+                    courseId: args.courseId,
+                    taskId: args.taskId
+                }).exec(function(err, task) {
                     if (err) return callback(err);
-                    course.tasks.splice(pos, 1);
                     course.save(function(err) {
                         if (err) return callback(err);
                         callback(null, task);

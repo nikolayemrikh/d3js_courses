@@ -12,7 +12,8 @@ define([
         className: "editTask",
         events: {
             "click .btn-prev": "goToStart",
-            "submit #edit-model-form": "send"
+            "submit #edit-model-form": "send",
+            "click .msg-close": "msgClose"
         },
         initialize: function(options) {
             // Variables
@@ -21,21 +22,28 @@ define([
             this.options = options || {};
             // Templates
             this.templates = _.parseTemplate(template);
-            this.courseNumber = this.options.courseNumber;
-            this.taskNumber = this.options.taskNumber;
-            if (this.taskNumber) {
+            if (this.options.taskId) {
                 this.collectionName = "task";
-                this.Model = TaskModel;
-                this.modelNumber = this.taskNumber;
+                this.modelId = this.options.taskId;
+                this.Model = Backbone.Model.extend({
+                    urlRoot: "/course/" + this.options.courseId + "/task/",
+                    idAttribute: "taskId"
+                });
+                this.model = new this.Model({
+                    taskId: this.options.taskId
+                });
             }
             else {
                 this.collectionName = "course";
-                this.modelNumber = this.courseNumber;
-                this.Model = CourseModel
+                this.modelId = this.options.courseId;
+                this.Model = Backbone.Model.extend({
+                    urlRoot: "/course/",
+                    idAttribute: "courseId"
+                });
+                this.model = new this.Model({
+                    courseId: this.options.courseId
+                });
             }
-            this.model = new this.Model({
-                _id: this.modelNumber
-            });
         },
         render: function() {
             var self = this;
@@ -65,7 +73,7 @@ define([
                 });
             }
             else if (this.collectionName === "task") {
-                app.router.navigate("start/" + this.courseNumber, {
+                app.router.navigate("start/" + this.options.courseId, {
                     trigger: true
                 });
             }
@@ -76,33 +84,55 @@ define([
             event.stopPropagation();
             var form = this.el.querySelector("#edit-model-form");
             if (this.collectionName == "task") {
+                this.model = new TaskModel({
+                    _id: self.model.attributes._id,
+                    courseId: self.model.attributes.courseId
+                });
                 this.model.set({
-                    isChallange: form.elements.is_challenge.value == 1 ? true : false,
+                    taskId: Number.parseInt(form.elements.task_number_in_course.value),
+                    isChallange: form.elements.task_is_challenge.value == "challenge" ? true : false,
                     taskName: form.elements.task_title.value,
-                    number: Number.parseInt(form.elements.task_number_in_course.value),
-                    courseId: this.courseModel.attributes._id
+                    taskDescription: form.elements.task_description.value,
+                    taskInfo: form.elements.task_info.value,
+                    goals: form.elements.task_goals.value,
+                    jsSolution: form.elements.task_js_check.value,
+                    htmlSolution: form.elements.task_html_solution ? form.elements.task_html_solution.value : null,
+                    jsBlocked: form.elements.task_js_block.checked,
+                    htmlBlocked: form.elements.task_html_block.checked,
+                    cssBlocked: form.elements.task_css_block.checked,
+                    initialJs: form.elements.task_initial_js.value,
+                    initialHtml: form.elements.task_initial_html.value,
+                    initialCss: form.elements.task_initial_css.value
                 });
             }
             else if (this.collectionName == "course") {
+                this.model = new CourseModel({
+                    _id: self.model.attributes._id
+                });
                 this.model.set({
+                    courseId: Number.parseInt(form.elements.course_number.value),
                     name: form.elements.course_name.value,
-                    number: Number.parseInt(form.elements.course_number.value),
+                    description: form.elements.course_description.value
                 });
             }
-            /*if (this.collection.findWhere({
-                    number: newObj.attributes.number
-                })) {
-                form.querySelector(".form-number").classList.toggle("has-error");
-            }*/
+            console.log(this.model)
             this.model.save(null, {
                 success: function(model, response, options) {
-                    console.log(model, response)
+                    
                 },
                 error: function(model, xhr, options) {
                     console.log("Не сохранено", model, xhr, options);
-                    //self.options.closeDialog();
+                    var alert = self.el.querySelector(".alert-msg");
+                    console.log(alert)
+                    alert.querySelector(".msg").innerText = xhr.responseText;
+                    alert.hidden = false;
                 }
             });
+        },
+        msgClose: function(event) {
+            var alert = this.el.querySelector(".alert-msg");
+            alert.querySelector(".msg").innerText = "";
+            alert.hidden = true;
         }
     });
     return View;

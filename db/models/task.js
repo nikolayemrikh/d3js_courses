@@ -5,11 +5,11 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var Task = new Schema({
     taskId: {
-        type: Number
-    },
-    courseId: {
         type: Number,
         unique: true
+    },
+    courseId: {
+        type: Number
     },
     course: {
         type: Schema.Types.ObjectId,
@@ -54,7 +54,6 @@ var Task = new Schema({
     cssBlocked: {
         type: Boolean
     },
-    
     isChallenge: {
         type: Boolean
     },

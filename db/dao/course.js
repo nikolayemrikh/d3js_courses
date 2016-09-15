@@ -66,12 +66,43 @@ module.exports = {
     },
     update: function(args, callback) {
         var data = args.data || {};
-        Course.findOneAndUpdate({
+        Course.findById(args._id, function(err, course) {
+            if (err) return callback(err);
+            console.log(args._id)
+            // Если новый courseId не равен старому, значит его поменяли. Надо проверить есть ли уже курс с courseId, на который хотят поменять
+            // Запросим все курсы
+            if (data.courseId != course.courseId) {
+                Course.find().where({courseId: data.courseId}).exec(function(err, courses) {
+                    if (err) return callback(err);
+                    //Теперь если такого курса с courseId, на который хотят поменять, нет, то можно всем заданиям этого курса обновить courseId
+                    if (courses.length > 0) return callback(new Error("Курс с таким номером уже существует в курсе"));
+                    Task.update({
+                        courseId: course.courseId
+                    }, {
+                        courseId: data.courseId
+                    }, {
+                        'multi': true
+                    }, function(err, tasks) {
+                        console.log(tasks)
+                        if (err) return callback(err);
+                        Course.findByIdAndUpdate(args._id, {
+                            '$set': data
+                        }, {
+                            'new': true
+                        }, function(err, course) {
+                            if (err) return callback(err);
+                            callback(null, course);
+                        });
+                    });
+                });
+            }
+        });
+        /*Course.findOneAndUpdate({
             courseId: args.courseId
         }, {
             '$set': data
         }, {
             'new': true
-        });
+        });*/
     }
 }

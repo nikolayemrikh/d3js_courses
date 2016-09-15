@@ -12,6 +12,9 @@ var Course = new Schema({
     name: {
         type: String
     },
+    description: {
+        type: String
+    },
     // Задания в курсе
     tasks: [{
         type: Schema.Types.ObjectId,

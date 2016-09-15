@@ -86,7 +86,6 @@ define([
                         };
                     }
                     data.completedItems = completedItems;
-                    console.log(data.completedItems)
 
                     this.$el.html(this.tpl(data));
                     if (self.options.role && self.options.role == 3) {
@@ -130,7 +129,6 @@ define([
                     event.stopPropagation();
                     if (!self.options.role || self.options.role != 3) return;
                     var model = this.model;
-                    console.log(model)
                     this.dialog = new BootstrapDialog({
                         draggable: true,
                         title: "Удаление",
@@ -140,16 +138,13 @@ define([
                             cssClass: "btn-danger",
                             icon: "glyphicon glyphicon-remove",
                             action: function(dialogItself) {
-                                console.log(model.attributes)
                                 model.destroy({
                                     wait: true,
                                     success: function(model, response, options) {
                                         var completedItems = self.completedItems;
                                         var pos = completedItems.indexOf(model.attributes._id);
                                         if (pos != -1) {
-                                            console.log(completedItems);
                                             completedItems.splice(pos, 1);
-                                            console.log(completedItems);
                                             if (self.collectionName === "task") {
                                                 self.options.profile.set({completedTasks: completedItems});
                                             } else if (self.collectionName === "course") {
@@ -296,7 +291,6 @@ define([
         },
         sendItem: function(collectionName, model) {
             var self = this;
-            console.log(model)
             if (collectionName === "task") {
                 model = new this.TaskModel(model);
             }

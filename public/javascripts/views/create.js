@@ -52,8 +52,9 @@ define([
             newObj = new this.Model();
             if (this.collectionName == "task") {
                 newObj.set({
-                    isChallange: form.elements.is_challenge.value == 1 ? true : false,
+                    isChallenge: form.elements.is_challenge.value == "challenge" ? true : false,
                     taskName: form.elements.task_title.value,
+                    taskDescription: form.elements.task_description.value,
                     courseId: this.courseId,
                     //Временно зададим номер, потому что нельзя послать в бекбоне модель с айди..
                     number: Number.parseInt(form.elements.task_number_in_course.value)
@@ -62,6 +63,7 @@ define([
                 newObj.set({
                     name: form.elements.course_name.value,
                     number: Number.parseInt(form.elements.course_number.value),
+                    description: form.elements.course_description.value
                 });
             }
             newObj.save(null, {

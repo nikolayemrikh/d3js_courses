@@ -13,7 +13,7 @@ define(["collections/tasks", "models/courseModel", "models/taskModel"], function
         routes: {
             "start(/:course)": "start",
             "main/:page": "main",
-            "edit/course/:courseNumber(/task/:taskNumber)": "edit",
+            "edit/course/:courseId(/task/:taskId)": "edit",
             "login": "login",
             "*path": "something"
         },
@@ -110,20 +110,20 @@ define(["collections/tasks", "models/courseModel", "models/taskModel"], function
                 }
             });
         },
-        edit: function(courseNumber, taskNumber) {
+        edit: function(courseId, taskId) {
             var self = this;
             require([
                 "views/edit"
             ], function(View) {
-                if (!courseNumber) {
+                if (!courseId) {
                     self.navigate("start", {
                         trigger: true
                     });
                 }
                 // Доделать: сделать, чтобы если нет такого номера задания в курсе, то открывалось первое задание по счету number в курсе
                 self.render(View, {
-                    courseNumber: courseNumber,
-                    taskNumber: taskNumber
+                    courseId: courseId,
+                    taskId: taskId
                 }, true);
             });
         }

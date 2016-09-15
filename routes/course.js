@@ -49,9 +49,9 @@ router.post('/', function(req, res, next) {
     });
 });
 // Update course
-router.put('/:courseId', function(req, res, next) {
+router.put('/:_id', function(req, res, next) {
     var args = {
-        number: req.params.courseId,
+        _id: req.params._id,
         data: req.body
     };
     course.update(args, function(err, data) {
@@ -60,7 +60,8 @@ router.put('/:courseId', function(req, res, next) {
             res.json(data);
         }
         else {
-            res.status(400).end();
+            //res.status(400).end();
+            res.status(400).send(err.message);
         }
     });
 });
