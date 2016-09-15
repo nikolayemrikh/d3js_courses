@@ -91,10 +91,13 @@ module.exports = {
             course.save(function(err) {
                 if (err) return callback(err);
                 var pos = course.tasks.indexOf(args.taskId);
-                Task.findOneAndRemove({courseId: args.courseId, taskId: args.taskId}).exec(function(err) {
+                Task.findOneAndRemove({courseId: args.courseId, taskId: args.taskId}).exec(function(err, task) {
                     if (err) return callback(err);
                     course.tasks.splice(pos, 1);
-                    course.save(callback);
+                    course.save(function(err) {
+                        if (err) return callback(err);
+                        callback(null, task);
+                    });
                 });
             });
         });

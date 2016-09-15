@@ -49,30 +49,7 @@ define([
             event.preventDefault();
             var form = this.el.querySelector("#create-task-form");
             var newObj;
-            /*if (this.collectionName == "task") {
-                var TaskModel = Backbone.Model.extend({
-                    urlRoot: "/course/" + this.courseId + "/task/",
-                    idAttribute: "taskId"
-                });
-                newObj = new TaskModel();
-                newObj.set({
-                    isChallange: form.elements.is_challenge.value == 1 ? true : false,
-                    taskName: form.elements.task_title.value,
-                    courseId: this.courseId,
-                    //Временно зададим номер, потому что нельзя послать в бекбоне модель с айди..
-                    number: Number.parseInt(form.elements.task_number_in_course.value)
-                });
-                console.log(newObj)
-            }
-            else if (this.collectionName == "course") {
-                newObj = new CourseModel();
-                newObj.set({
-                    name: form.elements.course_name.value,
-                    number: Number.parseInt(form.elements.course_number.value),
-                });
-            }*/
             newObj = new this.Model();
-            console.log(newObj)
             if (this.collectionName == "task") {
                 newObj.set({
                     isChallange: form.elements.is_challenge.value == 1 ? true : false,
@@ -93,28 +70,9 @@ define([
                 },
                 error: function(model, xhr, options) {
                     console.log("Не сохранено", model, xhr, options);
-                    //self.options.closeDialog();
                     form.querySelector(".form-number").classList.toggle("has-error");
                 }
             });
-            /*var newObj;
-            if (this.collectionName == "task") {
-                newObj = {
-                    isChallange: form.elements.is_challenge.value == 1 ? true : false,
-                    taskName: form.elements.task_title.value,
-                    courseId: Number.parseInt(this.courseId),
-                    //Временно зададим номер, потому что нельзя послать в бекбоне модель с айди..
-                    number: Number.parseInt(form.elements.task_number_in_course.value)
-                };
-                this.options.send("task", newObj);
-            }
-            else if (this.collectionName == "course") {
-                newObj = {
-                    name: form.elements.course_name.value,
-                    number: Number.parseInt(form.elements.course_number.value),
-                };
-                this.options.send("course", newObj);
-            }*/
         }
     });
     return View;

@@ -5,6 +5,7 @@ module.exports = {
         var course = new Course({
             name: args.data.name,
             description: args.data.description,
+            //В бэкбоне нельзя отправлять модели с заданным id, чтобы был метод POST
             courseId: args.data.number,
             tasks: args.data.tasks
         });
@@ -49,11 +50,17 @@ module.exports = {
             courseId: args.courseId
         }, function(err, course) {
             if (err) return callback(err);
-            course.tasks.forEach(function(_id, index, tasks) {
+            /*course.tasks.forEach(function(_id, index, tasks) {
                 Task.findByIdAndRemove(_id).exec(function(err) {
                     if (err) return callback(err);
                     if (index == tasks.length - 1) callback(null, course);
                 });
+            });*/
+            Task.remove({
+                courseId: args.courseId
+            }).exec(function(err) {
+                if (err) return callback(err);
+                callback(null, course);
             });
         });
     },

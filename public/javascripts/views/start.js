@@ -39,7 +39,7 @@ define([
                 collectionName = "task";
                 completedItems = this.options.profile.get("completedTasks");
             }
-            console.log(completedItems)
+            this.completedItems = completedItems;
             this.collectionName = collectionName;
             this.courseView = Backbone.View.extend({
                 tagName: "tr",
@@ -55,18 +55,19 @@ define([
                     this.listenTo(this.model, 'destroy', this.remove);
                     if (collectionName == "task") {
                         this.model.idAttribute = "taskId";
-                    } else if (collectionName == "course") {
+                    }
+                    else if (collectionName == "course") {
                         this.model.idAttribute = "courseId";
                     }
                 },
                 render: function() {
-                    console.log(this.model)
                     this.number = this.model.attributes.number;
                     var data;
                     if (collectionName === "course") {
                         data = {
                             //_id: this.model.attributes._id,
                             item: {
+                                _id: this.model.attributes._id,
                                 courseId: this.model.attributes.courseId,
                                 name: this.model.attributes.name,
                                 description: this.model.attributes.description
@@ -76,6 +77,7 @@ define([
                     else if (collectionName === "task") {
                         data = {
                             item: {
+                                _id: this.model.attributes._id,
                                 taskId: this.model.attributes.taskId,
                                 courseId: this.model.attributes.courseId,
                                 name: this.model.attributes.taskName,
@@ -84,6 +86,7 @@ define([
                         };
                     }
                     data.completedItems = completedItems;
+                    console.log(data.completedItems)
 
                     this.$el.html(this.tpl(data));
                     if (self.options.role && self.options.role == 3) {
@@ -141,6 +144,19 @@ define([
                                 model.destroy({
                                     wait: true,
                                     success: function(model, response, options) {
+                                        var completedItems = self.completedItems;
+                                        var pos = completedItems.indexOf(model.attributes._id);
+                                        if (pos != -1) {
+                                            console.log(completedItems);
+                                            completedItems.splice(pos, 1);
+                                            console.log(completedItems);
+                                            if (self.collectionName === "task") {
+                                                self.options.profile.set({completedTasks: completedItems});
+                                            } else if (self.collectionName === "course") {
+                                                self.options.profile.set({completedCourses: completedItems});
+                                            }
+                                            self.options.profile.save();
+                                        }
                                         dialogItself.close();
                                     },
                                     error: function(model, xhr, options) {

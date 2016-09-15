@@ -95,7 +95,7 @@
             </div>
         </div>
     </td>
-    <td><span class="label label-success"><% if (_.indexOf(completedItems, item.taskId ? item.taskId : item.courseId) != -1) {
+    <td><span class="label label-success"><% if (_.indexOf(completedItems, item._id) != -1) {
             %> Пройдено <%
         }%></span></td>
     <td><a href="#" class="btn btn-default start-course-btn">Начать</a></td>
