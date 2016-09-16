@@ -7,7 +7,8 @@ module.exports = {
             description: args.data.description,
             //В бэкбоне нельзя отправлять модели с заданным id, чтобы был метод POST
             courseId: args.data.number,
-            tasks: args.data.tasks
+            tasks: args.data.tasks,
+            files: args.data.files
         });
         course.save(function(err) {
             if (err) return callback(err);

@@ -156,7 +156,9 @@ var db = {
     },
     exam: require('./dao/exam'),
     verify: require('./dao/verify'),
-    group: require('./dao/group')
+    group: require('./dao/group'),
+    gfs: null,
+    mongoose: mongoose
 };
 conn.on('error', function(err) {
     logger.error("MongoDB connection error: " + err.message);
@@ -165,7 +167,7 @@ conn.once('open', function() {
     logger.info("MongoDb is connected");
     db.gfs = Grid(conn.db, mongoose.mongo);
 });
-db.mongoose = mongoose;
+
 module.exports = db;
 
 //var fixtures = require('./fixtures');

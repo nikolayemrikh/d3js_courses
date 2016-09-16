@@ -11,7 +11,8 @@ define([
     var View = Backbone.View.extend({
         className: "createPopup",
         events: {
-            "submit #create-task-form": "send"
+            //"submit #create-task-form": "send"
+            "click .btn-submit": "sendFiles"
         },
         initialize: function(options) {
             // Variables
@@ -44,12 +45,10 @@ define([
         destroy: function() {
             this.remove();
         },
-        send: function(event) {
+        send: function(files) {
             var self = this;
-            event.preventDefault();
-            var form = this.el.querySelector("#create-task-form");
-            var newObj;
-            newObj = new this.Model();
+            var form = document.forms.create_task_form;
+            var newObj = new this.Model();
             if (this.collectionName == "task") {
                 newObj.set({
                     isChallenge: form.elements.is_challenge.value == "challenge" ? true : false,
@@ -59,11 +58,13 @@ define([
                     //Временно зададим номер, потому что нельзя послать в бекбоне модель с айди..
                     number: Number.parseInt(form.elements.task_number_in_course.value)
                 });
-            } else if (this.collectionName == "course") {
+            }
+            else if (this.collectionName == "course") {
                 newObj.set({
                     name: form.elements.course_name.value,
                     number: Number.parseInt(form.elements.course_number.value),
-                    description: form.elements.course_description.value
+                    description: form.elements.course_description.value,
+                    files: files
                 });
             }
             newObj.save(null, {
@@ -75,6 +76,27 @@ define([
                     form.querySelector(".form-number").classList.toggle("has-error");
                 }
             });
+        },
+        sendFiles: function(event) {
+            var self = this;
+            event.preventDefault();
+            event.stopPropagation();
+            var formData = new FormData(document.forms.storage_form);
+            console.log(formData)
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/storage");
+            xhr.send(formData);
+            xhr.onreadystatechange = function() { // (3)
+                if (xhr.readyState != 4) return;
+                if (xhr.status != 200) {
+                    console.log(xhr);
+                }
+                else {
+                    console.log(xhr.responseText)
+                    self.send(JSON.parse(xhr.responseText));
+                }
+
+            }
         }
     });
     return View;

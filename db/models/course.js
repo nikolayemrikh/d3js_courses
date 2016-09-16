@@ -19,6 +19,9 @@ var Course = new Schema({
     tasks: [{
         type: Schema.Types.ObjectId,
         ref: 'Task'
+    }],
+    files: [{
+        type: Schema.Types.Mixed
     }]
 });
 var collectionName = 'courses';

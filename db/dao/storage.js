@@ -1,27 +1,53 @@
-var mongoose = require('mongoose');
 var fs = require('fs');
 var path = require('path');
+var config = require('nconf');
 var db = require('../index');
-var storage = {
+
+var dao = {
+    /**
+     * Загрузить файлы в GridFS.
+     * 
+     * @param {Object[]} files - Список загруженных на сервер файлов.
+     * @param {function} callback()
+     */
     upload: function(files, callback) {
-        if (!files) return;
-        files.forEach(function(file, i, arr) {
-            if (!file.uploadname) return;
-            var fullname = path.join('uploads', path.basename(file.uploadname));
+        console.log(files)
+        files = files || [];
+        if (!callback) callback = function() {};
+        var amount = files.length;
+        if (!amount) return callback();
+        var attach = [];
+        var next = function(data) {
+            if (data) attach.push(data);
+            if (--amount < 1) callback(attach);
+        };
+        var tmpdir = config.get('uploads:tmpdir');
+        files.forEach(function(file) {
+            // Если уже был загружен ранее
+            if (file.uploadDate) return next(file);
+            var fullname = path.join(tmpdir, path.basename(file.filename));
             fs.exists(fullname, function(exists) {
-                if (!exists) return;
+                if (!exists) return next();
                 var writestream = db.gfs.createWriteStream({
-                    _id: file.fileId,
-                    filename: file.filename
+                    filename: file.originalname,
+                    content_type: file.mimetype
                 });
                 fs.createReadStream(fullname).pipe(writestream);
                 writestream.on('close', function(data) {
-                    if (callback) callback(data);
                     fs.unlink(fullname);
+                    data.id = data._id;
+                    delete data._id;
+                    next(data);
                 });
             });
         });
     },
+    /**
+     * Скачать файл по его идентификатору.
+     * 
+     * @param {ObjectId} fileId - Идентификатор файла в GridFS.
+     * @param {function} callback(data)
+     */
     download: function(fileId, callback) {
         db.gfs.findOne({
             _id: fileId
@@ -32,47 +58,30 @@ var storage = {
                 });
                 readstream.pipe(callback(data));
             }
-            else {
-                callback();
-            }
+            else callback();
         });
     },
+    /**
+     * Удалить файлы из GridFS.
+     * 
+     * @param {Object[]} files - Список файлов для удаления.
+     * @param {ObjectId} files[].fileId - Идентификатор файла.
+     * @param {function} callback()
+     */
     remove: function(files, callback) {
-        if (!files) return;
+        files = files || [];
         if (!callback) callback = function() {};
-        files.forEach(function(file, i, arr) {
+        var amount = files.length;
+        if (!amount) return callback();
+        var next = function() {
+            if (--amount < 1) callback();
+        };
+        files.forEach(function(file) {
             db.gfs.remove({
-                _id: file.fileId
-            }, callback);
+                _id: file.id
+            }, next);
         });
-    },
-    update: function(files) {
-        if (!files) return;
-        var attachAdd = [];
-        var attachDel = [];
-        for (var i = 0, l = files.length; i < l; i++) {
-            if (files[i].removed) {
-                attachDel.push(files[i]);
-            }
-            else {
-                attachAdd.push(files[i]);
-            }
-        }
-        storage.upload(attachAdd);
-        storage.remove(attachDel);
-    },
-    setId: function(files) {
-        if (!files) return;
-        var attach = [];
-        for (var i = 0, l = files.length; i < l; i++) {
-            if (!files[i].fileId) {
-                files[i].fileId = mongoose.Types.ObjectId();
-            }
-            if (!files[i].removed) {
-                attach.push(files[i]);
-            }
-        }
-        return attach;
     }
 };
-module.exports = storage;
+
+module.exports = dao;

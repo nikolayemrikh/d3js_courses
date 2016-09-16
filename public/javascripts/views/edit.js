@@ -82,8 +82,11 @@ define([
             var self = this;
             event.preventDefault();
             event.stopPropagation();
+            this.msgClose();
             var form = this.el.querySelector("#edit-model-form");
+            var prevItemId;
             if (this.collectionName == "task") {
+                prevItemId = this.model.attributes.taskId;
                 this.model = new TaskModel({
                     _id: self.model.attributes._id,
                     courseId: self.model.attributes.courseId
@@ -106,6 +109,7 @@ define([
                 });
             }
             else if (this.collectionName == "course") {
+                prevItemId = this.model.attributes.courseId;
                 this.model = new CourseModel({
                     _id: self.model.attributes._id
                 });
@@ -115,10 +119,17 @@ define([
                     description: form.elements.course_description.value
                 });
             }
-            console.log(this.model)
             this.model.save(null, {
                 success: function(model, response, options) {
-                    
+                    if (self.collectionName == "task" && model.attributes.taskId != prevItemId) {
+                        app.router.navigate("edit/course/" + model.attributes.courseId + "/task/" + model.attributes.taskId, {
+                            trigger: true
+                        });
+                    } else if (self.collectionName == "course" && model.attributes.taskId != prevItemId) {
+                        app.router.navigate("edit/course/" + model.attributes.courseId, {
+                            trigger: true
+                        });
+                    }
                 },
                 error: function(model, xhr, options) {
                     console.log("Не сохранено", model, xhr, options);
