@@ -61,7 +61,6 @@ define([
                     }
                 },
                 render: function() {
-                    this.number = this.model.attributes.number;
                     var data;
                     if (collectionName === "course") {
                         data = {

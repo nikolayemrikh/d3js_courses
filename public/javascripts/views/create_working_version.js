@@ -93,11 +93,23 @@ define([
                 }
             });
         },
+        sendFileByFetch: function(url, formData) {
+            var options = {
+                body: formData
+            };
+            let promise = fetch(url, options);
+            promise.then(function(response) {
+                console.log(response)
+            }).catch(function(err) {
+                console.log(err);
+            });
+        },
         sendFiles: function(event) {
             var self = this;
             event.preventDefault();
             event.stopPropagation();
             var formData = new FormData(document.forms.storage_form);
+            // this.sendFileByFetch("/storage", formData)
             console.log(formData)
             var xhr = new XMLHttpRequest();
             xhr.open("POST", "/storage");
@@ -108,9 +120,10 @@ define([
                     console.log(xhr);
                 }
                 else {
-                    console.log(JSON.parse(xhr.responseText))
+                    console.log(xhr.responseText)
                     self.send(JSON.parse(xhr.responseText));
                 }
+
             }
         },
         addAnotherFileInput: function(event) {
@@ -125,10 +138,14 @@ define([
             var name = input.getAttribute("name");
             
             var lastInputNumberStr = document.querySelector(".files-input-container").dataset["lastInputNumber"];
+            console.log(lastInputNumberStr)
             var lastInputNumber = Number.parseInt(lastInputNumberStr);
+            console.log(lastInputNumber)
             var newlastInputNumber = lastInputNumber + 1;
+            console.log(newlastInputNumber)
             input.setAttribute("name", name + newlastInputNumber);
             document.querySelector(".files-input-container").dataset["lastInputNumber"] = newlastInputNumber.toString();
+            console.log(lastInputNumberStr)
             
             filesInputContainer.appendChild(label.cloneNode(true));
         },
@@ -138,22 +155,15 @@ define([
 
             var filesInputContainer = document.querySelector(".files-input-container");
             var allAnotherFileInputs = filesInputContainer.querySelectorAll(".add-another-file");
+            if (!allAnotherFileInputs.length) return;
+            var lastFileInput = allAnotherFileInputs[allAnotherFileInputs.length - 1];
+
+            filesInputContainer.removeChild(lastFileInput);
             
-            if (!allAnotherFileInputs.length) {
-                var firstFileInput = document.forms.storage_form.file1;
-                firstFileInput.value = "";
-                var label = firstFileInput.parentElement;
-                label.firstChild.nodeValue = "Прикрепить файл";
-            } else {
-                var lastFileInput = allAnotherFileInputs[allAnotherFileInputs.length - 1];
-    
-                filesInputContainer.removeChild(lastFileInput);
-                
-                var lastInputNumberStr = document.querySelector(".files-input-container").dataset["lastInputNumber"];
-                var lastInputNumber = Number.parseInt(lastInputNumberStr);
-                var newlastInputNumber = lastInputNumber - 1;
-                document.querySelector(".files-input-container").dataset["lastInputNumber"] = newlastInputNumber.toString();
-            }
+            var lastInputNumberStr = document.querySelector(".files-input-container").dataset["lastInputNumber"];
+            var lastInputNumber = Number.parseInt(lastInputNumberStr);
+            var newlastInputNumber = lastInputNumber - 1;
+            document.querySelector(".files-input-container").dataset["lastInputNumber"] = newlastInputNumber.toString();
         }
     });
     return View;

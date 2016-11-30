@@ -5,6 +5,7 @@ var storage = require('../db/dao/storage');
 var multer = require('multer');
 var fs = require('fs');
 var urlify = require('urlify').create();
+
 var upload = multer({
     dest: config.get('uploads:tmpdir'),
     limits: {
@@ -15,10 +16,10 @@ var upload = multer({
         fs.unlink('./' + file.path); // delete the partially written file
         file.failed = true;
     }
-}).array('files');
+});
 
 // Upload attach
-router.post('/', upload, function(req, res, next) {
+router.post('/', upload.any(), function(req, res, next) {
     /*var file = req.file;
     if (!file) return res.status(400).end();
     var fname = file.originalname;
@@ -28,12 +29,15 @@ router.post('/', upload, function(req, res, next) {
     // если multer не может писать в dest, то отправляет файл в виде буфера
     if (file.buffer) res.status(500).end();*/
     //else res.json(file);
-    
     var files = req.files;
     if (!files) return res.status(400).end();
     
     storage.upload(files, function(attach) {
         //res.json(file);
+        attach = attach.map(function(file, index) {
+            file.order = index;
+            return file;
+        });
         res.send(attach);
     });
 });

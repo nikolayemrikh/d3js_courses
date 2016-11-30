@@ -59,23 +59,55 @@
                 </div>
 			<% } %>
 			    <div class="form-group">
+			        <div class="col-sm-4" style="text-align: right;">
+                        <button type="button" class="btn btn-default btn-add-file-input" aria-label="Добавить еще один ввод файла">
+                            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                        </button>
+                        <button type="button" class="btn btn-default btn-remove-file-input" aria-label="Удалить ввод файла">
+                            <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                    <div class="col-sm-8 files-input-container" data-last-input-number="1" onchange="
+                        var target = event.target; 
+                        console.log(event);
+                        if (target.tagName != 'INPUT' && target.getAttribute('type') != 'file') return;
+                        var fileName;
+                        var label = target.parentElement;
+                        if (!target.files.length) {
+                            fileName = 'Прикрепить файл';
+                        } else {
+                            fileName = target.files[0].name;
+                            if (fileName.length > 15) {
+                                var extension = fileName.slice((fileName.lastIndexOf('.') - 1 >>> 0) + 2);
+                                fileName = fileName.replace(extension, '');
+                                if (fileName.length > 10) {
+                                    fileName = fileName.slice(0, 10) + '..' + (extension ? extension : '');
+                                }
+                            }
+                        }
+                        label.firstChild.nodeValue = fileName;
+                    ">
+                        <label class="btn btn-default">Прикрепить файл
+                            <input form="storage-form" type="file" name="file1" style="display: none;">
+                        </label>
+                    </div>
+                </div>
+			    <div class="form-group">
                     <div class="col-sm-offset-4 col-sm-8">
                         <input type="submit" name="save" id="save" value="Добавить" class="btn btn-primary btn-submit">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
                     </div>
                 </div>
             </form>
             <form name="storage_form" class="form-horizontal" id="storage-form" action="/storage" method="post" enctype="multipart/form-data">
-                <div class="form-group">
-                    <label for="course_files" class="control-label col-sm-4">Прикрепить файл</label>
-                    <div class="controls col-sm-8">
-                        <input type="file" name="files" id="course_files" multiple>
-                    </div>
-                </div>
             </form>
         </div>
-        <!-- <div class="modal-footer"> -->
-            <!-- <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button> -->
-        <!-- </div> -->
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+        </div>
     </div>
+    <template id="course-file-temp">
+        <label class="btn btn-default add-another-file">Прикрепить файл
+            <input form="storage-form" type="file" name="file" style="display: none;">
+        </label>
+    </template>
 </script>
